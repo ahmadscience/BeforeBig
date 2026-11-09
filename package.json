@@ -1,0 +1,53 @@
+{
+  "name": "beforebig",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.24.0",
+  "scripts": {
+    "dev": "next dev -H 127.0.0.1 -p 3247",
+    "build": "next build --webpack",
+    "start": "next start -H 127.0.0.1 -p 3247",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "perf:audit": "lhci autorun",
+    "env:check": "node scripts/check-env.mjs",
+    "verify": "tsc --noEmit && eslint && vitest run && next build --webpack",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node scripts/migrate.mjs",
+    "db:seed:demo:preview": "node scripts/seed-demo.mjs --dry-run",
+    "db:seed:demo": "node scripts/seed-demo.mjs"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.15.9",
+    "@radix-ui/react-slot": "^1.3.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "drizzle-orm": "^0.44.7",
+    "lucide-react": "^1.37.0",
+    "next": "^16.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwind-merge": "^3.6.0",
+    "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "@lhci/cli": "^0.15.1",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "dotenv": "^16.6.1",
+    "drizzle-kit": "^0.31.4",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.0.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  },
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "license": "MIT"
+}

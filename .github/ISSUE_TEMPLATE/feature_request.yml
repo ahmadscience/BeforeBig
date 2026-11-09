@@ -1,0 +1,16 @@
+name: Feature request
+description: Explain the user problem and a focused improvement.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem should this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Check docs/FEATURES.md first. Include examples and relevant source links.
+    validations:
+      required: true

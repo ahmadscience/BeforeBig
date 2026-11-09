@@ -1,0 +1,1 @@
+ALTER TABLE `analytics_events` ADD `entity_slug` text;

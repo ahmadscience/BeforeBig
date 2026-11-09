@@ -1,0 +1,40 @@
+node_modules/
+.next/
+out/
+dist/
+coverage/
+.lighthouseci/
+*.log
+.env
+.env.*
+!.env.example
+local.db
+local.db-shm
+local.db-wal
+.DS_Store
+
+# Local tooling and generated TypeScript cache
+.pnpm-store/
+*.tsbuildinfo
+# Application databases and backups (never publish user content)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.db.bak
+
+# Local credentials, tooling state, and database backups
+.agents/
+.codex/
+.aws/
+*.pem
+*.key
+*.p12
+*.pfx
+*.sqlite*
+*.db.*
+*.sql.gz
+*.dump
+*.bak
+.vercel/
