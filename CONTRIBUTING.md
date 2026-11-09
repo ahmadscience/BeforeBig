@@ -29,7 +29,7 @@ Use Vitest for domain behavior and security regressions. Add meaningful tests wh
 
 For schema changes, edit `src/db/schema.ts`, run `pnpm db:generate`, review the generated SQL and snapshots, then apply to your own disposable database using `pnpm db:migrate`. Commit the schema, SQL, and migration metadata together. Explain compatibility and data preservation; never delete applied migrations to rewrite history.
 
-`pnpm perf:audit` requires a completed production build, browser support, and port 3247. Unit tests do not prove the connected founder/moderator journey: report separately whether you tested authentication, saving, DNS verification, approval, and reactions against your own database.
+`pnpm perf:audit` requires a completed production build, browser support, and port 3247. It measures each route three times, checks median timing/performance values, and requires every run to meet accessibility, best-practices, and SEO thresholds. Unit tests do not prove the connected founder/moderator journey: report separately whether you tested authentication, saving, DNS verification, approval, and reactions against your own database.
 
 ## Reporting issues
 
