@@ -3543,3 +3543,5 @@ a.collection-card:hover { border-color: var(--line-strong); }
 .demo-url { display: block; overflow-wrap: anywhere; padding-block: 12px; color: var(--subtle); }
 @media (max-width: 720px) { .catalog-pagination { gap: 12px; } .catalog-demo .catalog-search input { font-size: 16px; } }
 @media (pointer: coarse) { .catalog-pagination a, .catalog-demo button { min-height: 44px; } }
+.today-header > div:first-child { min-width: 0; }
+.today-header h1 { overflow-wrap: anywhere; }
