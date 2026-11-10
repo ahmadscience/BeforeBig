@@ -57,6 +57,13 @@
       "when": 1794261608572,
       "tag": "0007_slow_thunderbolt",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1794298107825,
+      "tag": "0008_sparkling_warhawk",
+      "breakpoints": true
     }
   ]
 }

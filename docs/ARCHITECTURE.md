@@ -50,3 +50,10 @@ Draft submission without persistence returns a clearly labeled provisional previ
 - Third-party scripts stay optional and route-scoped. The app uses system fonts and has no media upload pipeline.
 - Hosting needs a server runtime and remote database; static export is not supported. No official service or background worker is provided.
 - CI runs typechecking, lint, tests, a production build, and the existing Lighthouse budgets. See [contributing](../CONTRIBUTING.md).
+
+
+## Community data boundary
+
+`src/db/community.ts` centralizes recommendation lifecycle and collection authorization. Server actions derive the actor from the session, validate input, apply durable rate limits, and invalidate dependent pages. Public reads filter relationship state and both product states. Collection reads apply visibility/ownership before returning titles or items, and public DTOs omit identity fields. Generic collection metadata prevents private title leakage.
+
+`/demo/community` is an isolated Client Component playground. Its local role switch never calls server actions, changes account permissions, or writes to a database.

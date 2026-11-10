@@ -32,3 +32,20 @@ An admin configured through `ADMIN_EMAILS` signs in and visits `/admin/moderatio
 ## Themes and accessibility
 
 The theme control stores a local preference. Navigation, search, comparison, and product links support keyboard use. A skip link moves to main content. Comparison tables can scroll horizontally on small screens and can be focused with a keyboard. Reduced-motion preferences suppress transitions.
+
+
+## Community-recommended alternatives
+
+On an approved, database-backed product page, sign in and open **Recommend an alternative**. Choose another approved product and explain the shared use case in 30–1,000 characters. Reasons are private while pending and become public only after moderator approval. Owners/editors cannot propose or support relationships involving their own products. There is one directional recommendation per product pair; other community members can add/remove one support vote per account.
+
+Your proposals show their status on the source product page. Withdraw a pending or approved proposal to hide it and clear its supports. A rejected or withdrawn proposal can be revised and resubmitted by its original author. A moderator reviews proposals at `/admin/moderation`; they cannot approve their own proposal. If either product loses approval, its relationship and support controls disappear from public views.
+
+## Saved collections
+
+Open **Collections**, sign in, and create a title/description. New collections default to private. Save approved products from their product pages, then remove individual items or edit the collection from its page. Repeated saves keep a single item. Each account can keep up to 50 active collections with 100 products each.
+
+Public collections are listed in community browsing and can be shared by their page URL. Titles, descriptions, and approved products are public; owner emails and IDs are not shown. Private collections return not-found to other viewers, even when they know the URL. Switching back to private immediately revokes public access. All collection pages use generic, non-indexable metadata.
+
+Removing a collection immediately hides its public URL and moves it to **Removed collections**, where the owner can restore it with its saved items. This is a soft removal: records are retained until the instance operator applies their retention/deletion policy. Account export and permanent account deletion remain future work.
+
+To try the flows without signing in, open `/demo/community`. Its role switch and actions affect fictional browser-memory data only, not actual roles, moderation, or saved account data.

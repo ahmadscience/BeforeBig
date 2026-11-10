@@ -266,3 +266,45 @@ export const trafficEntitlements = sqliteTable("traffic_entitlements", {
   enabled: integer("enabled", { mode: "boolean" }).notNull().default(false),
   createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
 });
+
+// Recommendations are directional: target is proposed as an alternative to source.
+export const alternativeRecommendations = sqliteTable("alternative_recommendations", {
+  id: text("id").primaryKey(),
+  sourceProductId: text("source_product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  targetProductId: text("target_product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  authorUserId: text("author_user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  reason: text("reason").notNull(),
+  status: text("status", { enum: ["pending", "approved", "rejected", "withdrawn"] }).notNull().default("pending"),
+  moderatedByUserId: text("moderated_by_user_id").references(() => users.id, { onDelete: "set null" }),
+  moderatedAt: integer("moderated_at", { mode: "timestamp_ms" }),
+  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
+}, (table) => [
+  uniqueIndex("alternative_recommendations_pair_unique").on(table.sourceProductId, table.targetProductId),
+  index("alternative_recommendations_queue_idx").on(table.status, table.createdAt),
+]);
+
+export const alternativeSupports = sqliteTable("alternative_supports", {
+  id: text("id").primaryKey(),
+  recommendationId: text("recommendation_id").notNull().references(() => alternativeRecommendations.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+}, (table) => [uniqueIndex("alternative_supports_recommendation_user_unique").on(table.recommendationId, table.userId)]);
+
+export const collections = sqliteTable("collections", {
+  id: text("id").primaryKey(),
+  ownerUserId: text("owner_user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("description").notNull().default(""),
+  visibility: text("visibility", { enum: ["private", "public"] }).notNull().default("private"),
+  deletedAt: integer("deleted_at", { mode: "timestamp_ms" }),
+  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
+}, (table) => [index("collections_owner_idx").on(table.ownerUserId), index("collections_public_idx").on(table.visibility, table.deletedAt, table.updatedAt)]);
+
+export const collectionItems = sqliteTable("collection_items", {
+  id: text("id").primaryKey(),
+  collectionId: text("collection_id").notNull().references(() => collections.id, { onDelete: "cascade" }),
+  productId: text("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+}, (table) => [uniqueIndex("collection_items_collection_product_unique").on(table.collectionId, table.productId)]);

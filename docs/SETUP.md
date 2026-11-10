@@ -8,7 +8,7 @@ If pnpm is unavailable, enable Corepack and activate the version in `package.jso
 
 ## Offline demo
 
-Copy `.env.example` to `.env.local` and run `pnpm dev`. Keep `DATABASE_URL` and provider credentials blank. This mode reads `src/data/demo-products.json`; it supports discovery, filtering, comparisons, and provisional URL previews. Authentication, moderation, reviews, durable analytics, and saving require a database. Example product URLs are fictional, not working services.
+Copy `.env.example` to `.env.local` and run `pnpm dev`. Keep `DATABASE_URL` and provider credentials blank. This mode reads `src/data/demo-products.json`; it supports discovery, filtering, comparisons, and provisional URL previews. `/demo/community` adds an interactive browser-only playground that resets on reload; persistent recommendations and collections require a database. Authentication, moderation, reviews, durable analytics, and saving require a database. Example product URLs are fictional, not working services.
 
 Next.js loads root environment files automatically. Scripts load `.env.local` and then `.env` with dotenv. Existing process variables take priority. Restart development after changes; `NEXT_PUBLIC_*` values are embedded at build time for production. Never place secrets in those variables.
 
@@ -22,7 +22,7 @@ pnpm db:seed:demo:preview
 pnpm db:seed:demo
 ```
 
-This version requires migration `0007_slow_thunderbolt.sql` for platform, license, pricing, and source metadata. Apply all checked migrations before starting the connected app.
+This version requires migration `0008_sparkling_warhawk.sql` for community recommendations, support votes, and saved collections. Apply all checked migrations before starting the connected app.
 
 These commands target the database in your environment. Review the target before running them. Migrations apply checked SQL through Drizzle's migration ledger. Demo seeding uses stable `demo_` IDs, skips conflicting domains/slugs, and updates its own existing records. Back up a database before schema changes. No automatic rollback command is provided.
 

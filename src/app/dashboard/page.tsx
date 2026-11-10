@@ -26,7 +26,7 @@ export default async function DashboardPage() {
     <section className="shell dashboard-section">
       <div className="dashboard-top">
         <div><p className="eyebrow">Founder workspace</p><h1>Build trust, <em>one record at a time.</em></h1><p className="muted">Signed in as {user.email}</p></div>
-        <div className="founder-row-actions"><form action={signOut}><button className="button button-ghost" type="submit">Sign out</button></form><Link href="/submit" className="button button-primary">Add product →</Link></div>
+        <div className="founder-row-actions"><Link href="/collections" className="button button-ghost">Your collections</Link><form action={signOut}><button className="button button-ghost" type="submit">Sign out</button></form><Link href="/submit" className="button button-primary">Add product →</Link></div>
       </div>
       {memberships.length ? (
         <div className="founder-product-list">

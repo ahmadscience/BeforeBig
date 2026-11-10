@@ -72,3 +72,15 @@ Supported foundation states are `founder_claimed`, `ownership_verified`, `editor
 ## Catalog metadata (migration 0007)
 
 `products.platforms_json` stores a validated list of supported platforms. `license_type` is unknown/open-source/proprietary; `pricing_model` is unknown/free/freemium/paid. `source_url` records a founder-provided public source URL and is required by the editor for an open-source claim. All new fields default to unknown/empty, preserving existing rows without inventing facts. SQLite text enums are enforced by the editor contract, not database CHECK constraints. Apply migration 0007 before running this version against a database.
+
+
+## Community recommendations and collections
+
+Migration `0008_sparkling_warhawk.sql` adds four tables:
+
+- `alternative_recommendations`: unique directional source/target pair, author, written reason, pending/approved/rejected/withdrawn state, and latest moderator attribution. Authors can revise their rejected/withdrawn proposal; support is cleared on withdrawal.
+- `alternative_supports`: unique recommendation/account support. Only approved relationships between approved records are publicly readable or supportable.
+- `collections`: owner, title, description, private/public visibility, timestamps, and soft-removal marker. Private is the default.
+- `collection_items`: unique collection/product save with cascade cleanup on actual collection/product deletion.
+
+Foreign keys and unique indexes protect associations. The data-access layer additionally enforces owner-only collection mutations, private read access, approved-product requirements, conflict-of-interest rules, and separate moderator approval. Public DTOs omit author/owner identities. Removed collections retain items for restoration and are excluded from all public reads.

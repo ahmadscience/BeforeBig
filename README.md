@@ -20,6 +20,8 @@ Open [127.0.0.1:3247](http://127.0.0.1:3247). Keep this project's reserved port 
 
 The example environment defaults to **offline demo mode**: no database account, email provider, CAPTCHA, or analytics account is required. Bundled fictional records use `.example` domains. Search and comparison work; login and persistent changes require your own database. Submitting a URL without persistence produces a provisional preview, not a saved record. Never copy someone else's database credentials.
 
+Try the browser-only community playground at `/demo/community` to explore recommendations, moderation, support votes, and collections with fictional data. Changes reset on reload.
+
 See [setup and configuration](docs/SETUP.md) to enable authentication and writes using your own Turso database. The application database adapter uses libSQL's web transport; a local SQLite file is not a supported application setup.
 
 ## What works
@@ -27,7 +29,8 @@ See [setup and configuration](docs/SETUP.md) to enable authentication and writes
 - Public product pages with price, fit, tags, lifecycle state, and ownership status.
 - Shareable catalog search, category/stage/platform/license/pricing filters, verified-only browsing, and sorting.
 - Side-by-side comparison of up to three public catalog records.
-- Related-product suggestions using shared categories/tags, explicitly labeled as suggestions.
+- Moderated community-recommended alternatives with reasons and support votes, separate from category/tag suggestions.
+- Owner-managed public/private collections with duplicate-safe saves, removal, and restore.
 - Email magic-link authentication, founder dashboard, editable drafts, DNS TXT ownership verification, and role-checked moderation.
 - Founder updates, moderated reviews, authenticated upvotes, and private reasoned downvotes pending admin approval.
 - Database-enforced account/network reaction limits and HMAC-based anonymous analytics.
@@ -63,6 +66,6 @@ pnpm perf:audit
 
 ## Status and license
 
-This is an early project, not a managed service. Payments, traffic guarantees, community-curated alternative relationships, and account export/deletion workflows are not implemented. See the [feature gap list](docs/FEATURES.md) before building on it.
+This is an early project, not a managed service. Payments, traffic guarantees, and account export/deletion workflows are not implemented. See the [feature gap list](docs/FEATURES.md) before building on it.
 
 Released under the [MIT License](LICENSE). Dependency licenses remain their respective authors'. UI refinement used [Unslop by Damir Sokolovsky](https://github.com/heydamir/unslop), licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); see [credits](CREDITS.md).

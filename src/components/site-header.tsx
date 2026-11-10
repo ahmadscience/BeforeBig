@@ -13,6 +13,7 @@ export function SiteHeader() {
         <nav className="nav-center" aria-label="Primary navigation">
           <Button asChild variant="ghost" size="sm"><Link href="/today">Discover</Link></Button>
           <Button asChild variant="ghost" size="sm"><Link href="/compare">Compare</Link></Button>
+          <Button asChild variant="ghost" size="sm"><Link href="/collections">Collections</Link></Button>
           <Button asChild variant="ghost" size="sm"><Link href="/dashboard">For founders</Link></Button>
         </nav>
         <div className="nav-links">

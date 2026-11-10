@@ -1,3 +1,5 @@
+import { CommunityForm } from "@/components/community-form";
+import { getCommunityStore } from "@/db/community";
 import type { Metadata } from "next";
 import { and, asc, eq, inArray, notLike } from "drizzle-orm";
 import { moderateDownvote, moderateProduct, moderateReview } from "@/app/admin/moderation/actions";
@@ -8,7 +10,8 @@ import { productDownvotes, products, reviews, users } from "@/db/schema";
 export const metadata: Metadata = { title: "Moderation", robots: { index: false, follow: false } };
 
 export default async function ModerationPage() {
-  await requireModerator();
+  const moderator = await requireModerator();
+  const alternativeQueue = await getCommunityStore()?.queue(moderator) ?? [];
   const db = getDb();
   const [productQueue, reviewQueue, downvoteQueue] = db ? await Promise.all([
     db.select().from(products).where(and(inArray(products.status, ["draft", "public", "suspended"]), notLike(products.id, "demo_%"))).orderBy(asc(products.updatedAt)),
@@ -30,6 +33,16 @@ export default async function ModerationPage() {
   return (
     <section className="shell manage-section">
       <div className="manage-heading"><div><p className="eyebrow">Admin</p><h1>Moderation queue</h1><p>Approval controls indexing. Verification and content quality remain separate checks.</p></div></div>
+      <section className="panel community-moderation"><h2>Alternative recommendations <span>{alternativeQueue.length}</span></h2>
+        {alternativeQueue.map((recommendation) => <article className="moderation-item" key={recommendation.id}>
+          <h3>{recommendation.targetName} as an alternative to {recommendation.sourceName}</h3><p>{recommendation.reason}</p>
+          {recommendation.authorId === moderator.id ? <p className="muted">Another moderator must review your recommendation.</p> : <div className="community-row">
+            <CommunityForm operation="moderate" fields={{ recommendationId: recommendation.id, decision: "approved" }} label="Approve alternative" />
+            <CommunityForm operation="moderate" fields={{ recommendationId: recommendation.id, decision: "rejected" }} label="Reject alternative" />
+          </div>}
+        </article>)}
+        {!alternativeQueue.length ? <p className="muted">No alternatives need attention.</p> : null}
+      </section>
       <div className="moderation-grid">
         <section className="panel"><h2>Product records <span>{productQueue.length}</span></h2>
           {productQueue.length ? productQueue.map((product) => (

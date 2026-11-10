@@ -62,3 +62,10 @@ The public analytics layer stores only an event type, public entity slug, timest
 ## Payments and future webhooks
 
 Stripe is not enabled in the demo. When enabled, raw signed webhook bodies are verified, processing is idempotent, and publication/ranking state never trusts a browser success redirect.
+
+
+## Recommendations and collections
+
+Recommendation reasons remain private until approved. Authors cannot moderate their own proposal; product owners/editors cannot recommend or support their own products. Support is account-unique and rate-limited; it does not use the product reaction network-lock policy. Reasons are escaped as text and become public with approval.
+
+Collection visibility is enforced at storage reads, not just navigation. Only owners can edit, save, remove, archive, or restore. Public collections are discoverable; private/removed collections return not-found to unauthorized viewers. Public responses omit owner email/ID, pending recommendation identities, and hidden product details. Collection metadata never includes private titles. Soft-removed collections retain data; instance operators must establish a retention policy.
