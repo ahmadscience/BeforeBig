@@ -46,7 +46,7 @@ Open **Collections**, sign in, and create a title/description. New collections d
 
 Public collections are listed in community browsing and can be shared by their page URL. Titles, descriptions, and approved products are public; owner emails and IDs are not shown. Private collections return not-found to other viewers, even when they know the URL. Switching back to private immediately revokes public access. All collection pages use generic, non-indexable metadata.
 
-Removing a collection immediately hides its public URL and moves it to **Removed collections**, where the owner can restore it with its saved items. This is a soft removal: records are retained until the instance operator applies their retention/deletion policy. Account export and permanent account deletion remain future work.
+Removing a collection immediately hides its public URL and moves it to **Removed collections**, where the owner can restore it with its saved items. This is a soft removal: records are retained until the instance operator applies their retention/deletion policy. Account export and permanent account deletion are available through **Dashboard → Privacy & data**; see [privacy controls](PRIVACY.md).
 
 To try the flows without signing in, open `/demo/community`. Its role switch and actions affect fictional browser-memory data only, not actual roles, moderation, or saved account data.
 
@@ -69,3 +69,12 @@ After the operator configures [private media storage](MEDIA.md), open your produ
 Moderators review the image tabs at `/admin/moderation`, including already approved images that need to be hidden or removed. A rejection note is visible to the founder. Owners/editors and moderators can permanently remove an image; access stops immediately, and storage deletion failures are reported for operator cleanup. Removal cannot erase previously downloaded copies.
 
 Try `/demo/media` without storage or an account. The sample upload, role switch, approval, cover, and removal actions affect fictional browser-memory images only. They do not exercise the live storage provider.
+
+
+## Your account data
+
+Open `/settings/privacy` from the dashboard. Download JSON, then separately save available image files using the authenticated links in the export before deleting. A recent magic-link sign-in (15 minutes) is required for exports, image downloads, signing out other sessions, and account deletion. If confirmation expires, use **Sign in again**. Large exports require operator assistance rather than returning incomplete data.
+
+Deletion requires the exact word `DELETE`, acknowledgement, and a choice for unshared owner-managed records: remove them and linked content, or retain public records as unclaimed. Unshared private records are deleted either way. Shared records stay for collaborators; personal contributions and uploaded images are removed. All sessions and existing sign-in links are revoked. Image cleanup can require operator retries; backups, anonymous logs, and external copies follow separate policies. See [the exact outcomes](PRIVACY.md#deletion-outcomes).
+
+At `/privacy`, anyone can keep optional analytics off or explicitly allow it for this browser. The choice lasts a year; Global Privacy Control overrides opt-in. Authentication and security protections remain active. Try `/demo/privacy` for a simulation without real account changes.

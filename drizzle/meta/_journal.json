@@ -78,6 +78,13 @@
       "when": 1794307380899,
       "tag": "0010_product_media",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1794332360356,
+      "tag": "0011_account_cleanup_grace",
+      "breakpoints": true
     }
   ]
 }

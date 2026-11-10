@@ -340,6 +340,8 @@ export const productMedia = sqliteTable("product_media", {
   rightsConfirmedAt: integer("rights_confirmed_at", { mode: "timestamp_ms" }).notNull(),
   moderatedByUserId: text("moderated_by_user_id").references(() => users.id, { onDelete: "set null" }),
   moderatedAt: integer("moderated_at", { mode: "timestamp_ms" }), moderationNote: text("moderation_note"),
+  // Uncertain/in-flight object writes need a grace period before physical cleanup.
+  cleanupAfter: integer("cleanup_after", { mode: "timestamp_ms" }),
   deletedAt: integer("deleted_at", { mode: "timestamp_ms" }), storageDeletedAt: integer("storage_deleted_at", { mode: "timestamp_ms" }),
   createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(), updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
 }, (table) => [

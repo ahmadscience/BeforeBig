@@ -27,7 +27,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <footer className="site-footer">
           <div className="shell footer-inner">
             <span className="footer-brand"><span className="footer-mark">B/</span> BeforeBig</span>
-            <nav aria-label="Footer navigation"><Link href="/today">Discover</Link><Link href="/submit">Submit</Link><Link href="/dashboard">For founders</Link></nav>
+            <nav aria-label="Footer navigation"><Link href="/today">Discover</Link><Link href="/submit">Submit</Link><Link href="/dashboard">For founders</Link><Link href="/privacy">Privacy</Link></nav>
             <span className="muted">Free demo · No paid ranking</span>
           </div>
         </footer>

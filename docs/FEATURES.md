@@ -14,7 +14,9 @@ BeforeBig focuses on early product discovery. Like a popular alternative tool, i
 - Recommend alternatives with written reasons; moderators approve before publication, and other accounts can support approved suggestions.
 - Create private or public collections, save/remove approved products, edit visibility, and restore removed collections.
 - Upload PNG/JPEG/WebP screenshots and product images with byte/dimension validation, metadata stripping, private storage, separate moderation, cover selection, and removal/cleanup. See [media setup](MEDIA.md).
-- Try the account-free browser playgrounds at `/demo/community`, `/demo/catalog`, and `/demo/media`.
+- Export account JSON and individual canonical images after recent sign-in; revoke other sessions or permanently delete the account with explicit product-record choices. See [privacy controls](PRIVACY.md).
+- Keep optional internal/GA4 analytics off by default, with browser opt-in/out and Global Privacy Control support.
+- Try the account-free browser playgrounds at `/demo/community`, `/demo/catalog`, `/demo/media`, and `/demo/privacy`.
 - Submit and edit products, verify domain ownership, and moderate public records.
 - Use authenticated upvotes and private reasoned downvotes, with account/network limits.
 - Browse offline examples or connect your own database and optional analytics providers.
@@ -28,6 +30,6 @@ Platform, license, and pricing fields default to unknown. Open-source claims req
 | Larger deployments | Cursor pagination, precomputed ranking counters, and split sitemaps |
 | Metadata evidence | Better provenance and software-license verification |
 | Additional media | Video support and automated content/rights screening |
-| Privacy controls | Account export, deletion, retention, and consent workflows |
+| Privacy operations | Account import, scheduled retention, external-provider erasure, and backup reconciliation |
 
 Payments, traffic guarantees, and editorial/news publishing are outside the current scope. See [CONTRIBUTING.md](../CONTRIBUTING.md) to propose or implement improvements.

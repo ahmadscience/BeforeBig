@@ -94,14 +94,14 @@ describe("media authorization and lifecycle", () => {
   });
   it("collects only stale unfinished uploads and preserves tombstones across hard product deletion", async () => {
     const old=await store.reserve(owner,"test-product",metadata,details); const fresh=await store.reserve(owner,"test-product",metadata,details); const complete=await pending();
-    await db.update(schema.productMedia).set({createdAt:new Date(Date.now()-2*60*60_000)}).where(eq(schema.productMedia.id,old.id));
+    await db.update(schema.productMedia).set({createdAt:new Date(Date.now()-2*60*60_000),cleanupAfter:new Date(0)}).where(eq(schema.productMedia.id,old.id));
     expect((await cleanupMedia(store,storage)).candidates).toBe(1);
     expect(await store.claimCleanup(fresh.id,new Date(Date.now()-60*60_000))).toBe(false);
     expect(await store.claimCleanup(complete.id,new Date(Date.now()+60*60_000))).toBe(false);
     await cleanupMedia(store,storage,true);
     await db.delete(schema.products).where(eq(schema.products.id,"product"));
     const rows=await db.select().from(schema.productMedia); expect(rows.every(row=>row.productId===null && row.deletedAt!==null)).toBe(true);
-    expect(await store.readable(complete.id,owner)).toBeNull(); expect((await cleanupMedia(store,storage,true)).deleted).toBe(2); expect(objects.size).toBe(0);
+    expect(await store.readable(complete.id,owner)).toBeNull(); expect((await cleanupMedia(store,storage,true,new Date(Date.now()+2*60*60_000))).deleted).toBe(2); expect(objects.size).toBe(0);
   });
   it("verifies object integrity on reads and hides already approved images on rejection", async () => {
     const row=await pending(); await store.moderate(moderator,row.id,"approved","");
@@ -118,6 +118,7 @@ describe("media authorization and lifecycle", () => {
     vi.mocked(storage.remove).mockRejectedValueOnce(Error("Temporary cleanup failure"));
     await expect(uploadMedia(store,storage,owner,"test-product",request())).rejects.toMatchObject({status:503,message:"The image could not be stored. Please try again later."});
     expect((await store.ownedMedia(owner,"test-product"))).toHaveLength(1);
-    expect((await cleanupMedia(store,storage,true)).deleted).toBe(1); expect(objects.size).toBe(1);
+    expect((await cleanupMedia(store,storage,true)).deleted).toBe(0);
+    expect((await cleanupMedia(store,storage,true,new Date(Date.now()+2*60*60_000))).deleted).toBe(1); expect(objects.size).toBe(1);
   });
 });

@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { and, asc, count, desc, eq, inArray, isNotNull, isNull, lt, max, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, isNotNull, isNull, lt, lte, max, or } from "drizzle-orm";
 import { getDb } from "@/db/client";
 import { productMedia as media, products, productMemberships, productEvents } from "@/db/schema";
 import { mediaLimits, storedMediaDetailsSchema, mediaMetadataSchema, mediaObjectKey, mediaUploadMetadataSchema, MediaError, type MediaItem } from "@/lib/media";
@@ -47,7 +47,7 @@ export function createMediaStore(db: Database) {
         const [total] = await tx.select({ value: count(), last: max(media.position) }).from(media).where(and(eq(media.productId, product.id), isNull(media.deletedAt)));
         if (total.value >= mediaLimits.items) throw new MediaError("A product can have up to six images. Remove one before uploading another.", 409);
         const id = randomUUID(); const storageKey = mediaObjectKey(id); const now = new Date();
-        await tx.insert(media).values({ id, storageKey, productId: product.id, uploaderUserId: actor.id, altText: metadata.altText, caption: metadata.caption, kind: metadata.kind, ...details, position: (total.last ?? -1) + 1, rightsConfirmedAt: now, createdAt: now, updatedAt: now });
+        await tx.insert(media).values({ id, storageKey, productId: product.id, uploaderUserId: actor.id, altText: metadata.altText, caption: metadata.caption, kind: metadata.kind, ...details, position: (total.last ?? -1) + 1, rightsConfirmedAt: now, cleanupAfter: new Date(now.getTime()+60*60_000), createdAt: now, updatedAt: now });
         return { id, storageKey, productSlug: product.slug };
       });
     },
@@ -57,7 +57,7 @@ export function createMediaStore(db: Database) {
         if (row.status !== "uploading") throw new MediaError("This upload is no longer active.", 409);
         const [product] = await tx.select().from(products).where(eq(products.id, row.productId!)).limit(1);
         if (!product || !["draft", "public", "approved"].includes(product.status)) throw new MediaError("Product is no longer accepting media.", 409);
-        await tx.update(media).set({ status: "pending", updatedAt: new Date() }).where(eq(media.id, id));
+        await tx.update(media).set({ status: "pending", cleanupAfter: null, updatedAt: new Date() }).where(eq(media.id, id));
         await tx.insert(productEvents).values({ id: randomUUID(), productId: row.productId!, actorUserId: actor.id, eventType: "media_uploaded", occurredAt: new Date() });
       });
     },
@@ -119,16 +119,16 @@ export function createMediaStore(db: Database) {
       return row.storageKey;
     },
     // System-only lifecycle methods; IDs originate from reservations/cleanup, never a user key.
-    async failReservation(id: string) { await db.update(media).set({ status: "failed", deletedAt: new Date(), updatedAt: new Date() }).where(eq(media.id, id)); },
+    async failReservation(id: string) { await db.update(media).set({ status: "failed", storageDeletedAt: null, deletedAt: new Date(), updatedAt: new Date() }).where(eq(media.id, id)); },
     async markStorageDeleted(id: string) { await db.update(media).set({ storageDeletedAt: new Date() }).where(and(eq(media.id, id), isNotNull(media.deletedAt))); },
     async cleanupCandidates(cutoff: Date) {
       return db.select({ id: media.id, storageKey: media.storageKey }).from(media)
-        .where(and(isNull(media.storageDeletedAt), or(isNotNull(media.deletedAt), and(eq(media.status, "uploading"), lt(media.createdAt, cutoff)))))
+        .where(and(isNull(media.storageDeletedAt), or(isNull(media.cleanupAfter), lte(media.cleanupAfter,new Date(cutoff.getTime()+60*60_000))), or(isNotNull(media.deletedAt), and(eq(media.status, "uploading"), lt(media.createdAt, cutoff)))))
         .orderBy(asc(media.createdAt)).limit(100);
     },
     async claimCleanup(id: string, cutoff: Date) {
       const rows = await db.update(media).set({ status: "deleted", deletedAt: new Date(), updatedAt: new Date() })
-        .where(and(eq(media.id, id), isNull(media.storageDeletedAt), or(isNotNull(media.deletedAt), and(eq(media.status, "uploading"), lt(media.createdAt, cutoff)))))
+        .where(and(eq(media.id, id), isNull(media.storageDeletedAt), or(isNull(media.cleanupAfter), lte(media.cleanupAfter,new Date(cutoff.getTime()+60*60_000))), or(isNotNull(media.deletedAt), and(eq(media.status, "uploading"), lt(media.createdAt, cutoff)))))
         .returning({ id: media.id });
       return rows.length > 0;
     },

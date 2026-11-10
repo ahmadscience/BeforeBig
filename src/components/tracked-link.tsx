@@ -1,5 +1,6 @@
 "use client";
 
+import { browserAnalyticsAllowed } from "@/lib/privacy";
 import type { AnchorHTMLAttributes, MouseEvent } from "react";
 
 type TrackedLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
@@ -14,7 +15,7 @@ declare global {
 
 export function TrackedProductLink({ productSlug, onClick, ...props }: TrackedLinkProps) {
   function handleClick(event: MouseEvent<HTMLAnchorElement>) {
-    window.gtag?.("event", "product_outbound_click", {
+    if (browserAnalyticsAllowed()) window.gtag?.("event", "product_outbound_click", {
       product_slug: productSlug,
     });
     onClick?.(event);

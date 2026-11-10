@@ -8,7 +8,7 @@ If pnpm is unavailable, enable Corepack and activate the version in `package.jso
 
 ## Offline demo
 
-Copy `.env.example` to `.env.local` and run `pnpm dev`. Keep `DATABASE_URL` and provider credentials blank. This mode reads `src/data/demo-products.json`; it supports discovery, filtering, comparisons, and provisional URL previews. `/demo/catalog` demonstrates multi-page search and taxonomy browsing. `/demo/community` adds an interactive browser-only playground that resets on reload; persistent recommendations and collections require a database. Authentication, moderation, reviews, durable analytics, and saving require a database. `/demo/media` demonstrates screenshot moderation and galleries using sample images. Example product URLs are fictional, not working services.
+Copy `.env.example` to `.env.local` and run `pnpm dev`. Keep `DATABASE_URL` and provider credentials blank. This mode reads `src/data/demo-products.json`; it supports discovery, filtering, comparisons, and provisional URL previews. `/demo/catalog` demonstrates multi-page search and taxonomy browsing. `/demo/community` adds an interactive browser-only playground that resets on reload; persistent recommendations and collections require a database. Authentication, moderation, reviews, durable analytics, and saving require a database. `/demo/media` demonstrates screenshot moderation and galleries using sample images. `/demo/privacy` simulates export and deletion consequences. Example product URLs are fictional, not working services.
 
 Next.js loads root environment files automatically. Scripts load `.env.local` and then `.env` with dotenv. Existing process variables take priority. Restart development after changes; `NEXT_PUBLIC_*` values are embedded at build time for production. Never place secrets in those variables.
 
@@ -22,7 +22,7 @@ pnpm db:seed:demo:preview
 pnpm db:seed:demo
 ```
 
-This version requires all checked migrations through `0010_product_media.sql` (private media). Migration `0009_catalog_search.sql` is required for FTS5 search, indexed taxonomy, and query indexes. Apply all checked migrations before starting the connected app. This project targets the existing `@libsql/client` adapter and requires SQLite/libSQL with FTS5 and JSON functions. The separate native Turso Database engine uses a different full-text API and is not a drop-in replacement for this migration; see the [engine compatibility reference](https://github.com/tursodatabase/turso/blob/main/COMPAT.md).
+This version requires all checked migrations through `0011_account_cleanup_grace.sql` (private media and account-deletion cleanup safety). Migration `0009_catalog_search.sql` is required for FTS5 search, indexed taxonomy, and query indexes. Apply all checked migrations before starting the connected app. This project targets the existing `@libsql/client` adapter and requires SQLite/libSQL with FTS5 and JSON functions. The separate native Turso Database engine uses a different full-text API and is not a drop-in replacement for this migration; see the [engine compatibility reference](https://github.com/tursodatabase/turso/blob/main/COMPAT.md).
 
 The migration creates and backfills `product_search` and `product_catalog_terms`, plus maintenance triggers. No separate search service or credential is required. A migration error mentioning `fts5` means the target engine/build needs FTS5 support; do not bypass the migration or mistake sample fallback for a working index.
 
@@ -71,7 +71,7 @@ No official deployment is planned. If you host your own, use a Node-compatible N
 
 Set the HTTPS app origin, production database, salts, admin allowlist, email delivery, anonymous-form CAPTCHA, and persistence flag. Run `pnpm env:check` with those values loaded, then `pnpm build` and `pnpm start` (or your hosting adapter). The start script binds loopback port 3247; put a reverse proxy in front when self-hosting. The environment checker requires the full connected configuration, not the offline demo. A passing checker validates configuration shape, not provider connectivity.
 
-Before accepting other people's data, define retention, consent, backups, deletion, and support processes. Those operational workflows are not supplied by this project.
+Before accepting other people's data, define retention, consent, backups, deletion, and support processes. Account export/deletion controls are supplied; managed retention, backup reconciliation, external-provider erasure, and support operations remain the instance operator’s responsibility. Read [privacy setup and limits](PRIVACY.md) before accepting accounts.
 
 ## Troubleshooting
 

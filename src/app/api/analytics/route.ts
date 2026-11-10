@@ -1,9 +1,12 @@
+import { cookies } from "next/headers";
+import { analyticsAllowed, privacyCookie } from "@/lib/privacy";
 import { NextResponse } from "next/server";
 import { analyticsEventSchema } from "@/lib/analytics-types";
 import { recordAnalyticsEvent } from "@/lib/analytics";
 import { findProductBySlug } from "@/lib/products";
 
 export async function POST(request: Request) {
+  if (!analyticsAllowed((await cookies()).get(privacyCookie)?.value, request.headers.get("sec-gpc"))) return new NextResponse(null, {status:204});
   let input;
   try {
     input = analyticsEventSchema.parse(await request.json());

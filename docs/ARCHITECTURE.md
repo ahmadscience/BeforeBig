@@ -68,3 +68,10 @@ Draft submission without persistence returns a clearly labeled provisional previ
 `POST /api/products/[slug]/media` accepts a bounded raw body and URL-encoded JSON image details in `X-Media-Metadata`; same-origin, session, membership, upload flag, and durable account limits are checked first. `/media/[id]` rechecks current visibility and verifies stored size/digest on every request. It never returns keys or redirects to buckets. `MediaImage` bypasses Next image optimization because its cache would undermine revocation. Public gallery markup contains only approved media on visible products.
 
 `/demo/media` is isolated browser-memory sample data; its role switch never grants real privileges. `scripts/media-cleanup.ts` defaults to a dry run and requires `--apply` for physical deletion. No bucket or background job is provisioned. See [media configuration and limits](MEDIA.md).
+
+
+## Account lifecycle
+
+`src/db/account.ts` centralizes recent-session validation, export projections, session revocation, and transactional account deletion. `/api/account/*` derives the session hash from the HttpOnly cookie, enforces Origin/limits, and never accepts a target user from the client. Exports use a consistent database snapshot and separate protected image attachments. Deletion returns only outcome counts; private cleanup keys remain server-side. It revokes media reads before a bounded storage cleanup attempt, with existing tombstones preserving failed work. Migration `0011_account_cleanup_grace.sql` adds a cleanup deadline to existing media rows so deleting an account cannot race an in-flight object write.
+
+`/privacy` exposes browser-level analytics choices; `/settings/privacy` is authenticated and noindex. `src/lib/privacy.ts` is shared by browser beacons and server collection paths. Optional GA tags are omitted unless allowed; page reload applies an updated choice to already-loaded scripts. `/demo/privacy` uses only fictional in-memory state. See [privacy and retention](PRIVACY.md).

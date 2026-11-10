@@ -1,12 +1,20 @@
 # BeforeBig
 
-A software discovery app for finding early products, comparing their fit, and keeping a verified product record. Built with Next.js App Router, React, TypeScript, Drizzle, and Turso/libSQL.
+**Discover useful software early. Keep the evidence in one place.**
 
-BeforeBig is an MIT-licensed community project. Run the demo, study the implementation, or configure your own instance. There is no official hosted service.
+An MIT-licensed software discovery app with searchable product records, thoughtful comparisons, community recommendations, saved collections, and founder-managed galleries. Run it locally, learn from the code, or configure your own instance. **There is no official hosted service.**
 
-## Try it locally
+[Getting started](#run-the-local-demo) · [Features](#explore-the-project) · [Documentation](#documentation) · [Contributing](CONTRIBUTING.md) · [MIT license](LICENSE)
 
-Use **Node.js 24** (the CI baseline) and **pnpm 11.24.0** (pinned in `package.json`).
+[![CI](https://github.com/ahmadscience/BeforeBig/actions/workflows/ci.yml/badge.svg)](https://github.com/ahmadscience/BeforeBig/actions/workflows/ci.yml)
+
+![BeforeBig discovery catalog, shown with fictional sample data](docs/images/catalog-preview.png)
+
+*Browser preview with fictional data. The included playgrounds work without a database or provider accounts.*
+
+## Run the local demo
+
+Use **Node.js 24** and **pnpm 11.24.0** (pinned in `package.json`).
 
 ```bash
 corepack enable
@@ -16,59 +24,71 @@ cp .env.example .env.local
 pnpm dev
 ```
 
-Open [127.0.0.1:3247](http://127.0.0.1:3247). Keep this project's reserved port `3247`; ports `3000` and `3100` may belong to other projects.
+Open [127.0.0.1:3247](http://127.0.0.1:3247). Keep the reserved port `3247`; `3000` and `3100` may belong to other projects.
 
-The example environment defaults to **offline demo mode**: no database account, email provider, CAPTCHA, or analytics account is required. Bundled fictional records use `.example` domains. Search and comparison work; login and persistent changes require your own database. Submitting a URL without persistence produces a provisional preview, not a saved record. Never copy someone else's database credentials.
+The default is **offline demo mode**. Leave `DATABASE_URL` and provider credentials blank: fictional `.example` records support discovery and comparison without a database, email, CAPTCHA, or analytics account. Persistent changes require your own database. URL submissions without persistence create provisional previews, not saved records.
 
-Try the catalog playground at `/demo/catalog` and the community playground at `/demo/community` to explore recommendations, moderation, support votes, and collections with fictional data. The media playground at `/demo/media` demonstrates image review and galleries. Changes reset on reload.
+| Playground | Try it |
+| --- | --- |
+| `/demo/catalog` | Search, pagination, category and tag browsing |
+| `/demo/community` | Recommendations, review decisions, support votes, collections |
+| `/demo/media` | Private image previews, moderation, gallery covers, removal |
+| `/demo/privacy` | Recent sign-in, sample export, deletion consequences |
 
-See [setup and configuration](docs/SETUP.md) to enable authentication and writes using your own Turso database. The application database adapter uses libSQL's web transport; a local SQLite file is not a supported application setup.
+Playground actions use fictional browser-memory data and reset on reload. They never grant real roles, upload files, export accounts, or delete user data.
 
-## What works
+## Explore the project
 
-- Public product pages with price, fit, tags, lifecycle state, and ownership status.
-- Indexed FTS5 catalog search, bounded pagination, category/stage/platform/license/pricing filters, and sorting.
-- Dedicated category and tag directories/pages with shareable URLs.
-- Side-by-side comparison of up to three public catalog records.
-- Moderated community-recommended alternatives with reasons and support votes, separate from category/tag suggestions.
-- Owner-managed public/private collections with duplicate-safe saves, removal, and restore.
-- Email magic-link authentication, founder dashboard, editable drafts, DNS TXT ownership verification, and role-checked moderation.
-- Validated screenshot/image uploads, private local or S3-compatible storage, moderation, gallery covers, and retryable removal.
-- Founder updates, moderated reviews, authenticated upvotes, and private reasoned downvotes pending admin approval.
-- Database-enforced account/network reaction limits and HMAC-based anonymous analytics.
-- Optional GA4 reporting, light/dark themes, security headers, sitemap/noindex rules, CI, and Lighthouse budgets.
+| Area | What is implemented |
+| --- | --- |
+| Discovery | FTS5 word-prefix search, stable pagination, category/tag pages, metadata filters, and sorting |
+| Product evidence | Price, platforms, license/source claims, fit, lifecycle, DNS ownership verification, and founder updates |
+| Comparison | Shareable side-by-side comparisons of up to three public records |
+| Community | Moderated alternative recommendations, support votes, reviews, authenticated reactions, private downvote reasons |
+| Collections | Private by default; public sharing, duplicate-safe saves, removal, and restore |
+| Product media | Validated PNG/JPEG/WebP images, metadata stripping, private local/S3-compatible storage, separate moderation, cover selection, cleanup |
+| Account privacy | Recent-sign-in JSON export, separate image downloads, session revocation, transactional deletion, explicit product-retention choices |
+| Measurement | Browser opt-in controls for internal analytics and optional GA4; Global Privacy Control respected |
 
-Offline fixtures are labeled samples and cannot accept persistent reactions. Connected demo rows have real database counters but remain `noindex`. Ownership verification proves domain control; it does not endorse pricing or other founder claims.
+Ownership verification proves domain control, not an endorsement of product claims. Sample records cannot accept persistent reactions. Connected demo records have live counters but remain `noindex`.
 
-## Check changes
+## Configure your own instance
+
+Start with [setup](docs/SETUP.md) for your own Turso/libSQL database, migrations, authentication, and environment variables. The application uses libSQL's web adapter; a local SQLite file is supported by test/migration tooling, not the application runtime.
+
+- Enable [private media storage](docs/MEDIA.md) before accepting image uploads. Uploads are disabled by default.
+- Read [account privacy and deletion](docs/PRIVACY.md) before collecting personal data. Set operator contact, retention, backup, and cleanup processes.
+- Keep secrets server-only. Never commit `.env.local`, databases, exports, or private uploads. Use `.env.example` as the configuration reference.
+
+This is an early source project, not a managed service. Payments, traffic guarantees, video uploads, account import, automated provider erasure, and a managed retention worker are not implemented. See the [remaining work](docs/FEATURES.md).
+
+## Develop and verify
+
+Built with **Next.js App Router, React, TypeScript, Drizzle, and Turso/libSQL**. Application code is in `src/`; checked SQL migrations are in `drizzle/`; operational commands are in `scripts/`.
 
 ```bash
 pnpm typecheck
 pnpm lint
 pnpm test
 pnpm build
-# After building; requires a browser and free port 3247:
+# After building, with a browser available and port 3247 free:
 pnpm perf:audit
 ```
 
-`pnpm verify` runs typechecking, lint, unit tests, and the production build. `pnpm env:check` checks a fully configured **hosted** instance; it intentionally fails for the offline demo. Builds load `.env.local`; use an isolated configuration if you want checks to avoid your database entirely.
+`pnpm verify` runs typechecking, lint, tests, and the production build. `pnpm env:check` validates a fully configured hosted instance and intentionally fails for the offline demo. Builds load `.env.local`; use isolated process variables to avoid your database during checks. CI runs the same code checks and Lighthouse budgets.
 
 ## Documentation
 
-| Guide | Contents |
+| Start here | Go deeper |
 | --- | --- |
-| [Setup](docs/SETUP.md) | Offline demo, database, environment variables, troubleshooting |
-| [Usage](docs/USAGE.md) | Discovery, comparisons, founder and moderator workflows |
-| [Contributing](CONTRIBUTING.md) | Development workflow, code comments, tests, pull requests |
-| [Architecture](docs/ARCHITECTURE.md) | Runtime boundaries and repository map |
-| [Data model](docs/DATA_MODEL.md) | Tables, lifecycle, and reaction invariants |
-| [Security model](docs/SECURITY.md) | Authentication, URL handling, privacy, limitations |
-| [Media](docs/MEDIA.md) | Image validation, private storage setup, moderation, cleanup |
-| [Analytics](docs/ANALYTICS.md) | Counter definitions and optional GA4 |
-| [Features and roadmap](docs/FEATURES.md) | Supported capabilities and planned improvements |
+| [Setup & configuration](docs/SETUP.md) | [Architecture](docs/ARCHITECTURE.md) |
+| [User workflows](docs/USAGE.md) | [Data model](docs/DATA_MODEL.md) |
+| [Privacy, export & deletion](docs/PRIVACY.md) | [Security model](docs/SECURITY.md) |
+| [Media storage & cleanup](docs/MEDIA.md) | [Analytics definitions](docs/ANALYTICS.md) |
+| [Contributing](CONTRIBUTING.md) | [Features & remaining work](docs/FEATURES.md) |
 
-## Status and license
+Bug reports and focused improvements are welcome through [GitHub issues](https://github.com/ahmadscience/BeforeBig/issues) and pull requests. Read [contributor instructions](AGENTS.md) before changing behavior; report sensitive problems using [the security policy](SECURITY.md), not a public issue containing private data.
 
-This is an early project, not a managed service. Payments, traffic guarantees, and account export/deletion workflows are not implemented. See the [feature gap list](docs/FEATURES.md) before building on it.
+## License and credits
 
 Released under the [MIT License](LICENSE). Dependency licenses remain their respective authors'. UI refinement used [Unslop by Damir Sokolovsky](https://github.com/heydamir/unslop), licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); see [credits](CREDITS.md).

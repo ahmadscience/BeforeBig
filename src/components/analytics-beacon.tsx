@@ -1,5 +1,6 @@
 "use client";
 
+import { browserAnalyticsAllowed } from "@/lib/privacy";
 import { useEffect } from "react";
 
 type AnalyticsBeaconProps = {
@@ -9,16 +10,19 @@ type AnalyticsBeaconProps = {
 };
 
 function getSessionId() {
+  try {
   const key = "beforebig.analytics.session";
   const current = window.sessionStorage.getItem(key);
   if (current) return current;
   const next = `${crypto.randomUUID()}-${Date.now()}`;
   window.sessionStorage.setItem(key, next);
   return next;
+  } catch { return undefined; } // Restricted browser storage must not break the page.
 }
 
 export function AnalyticsBeacon({ eventType, entitySlug, surfaceType }: AnalyticsBeaconProps) {
   useEffect(() => {
+    if (!browserAnalyticsAllowed()) return;
     const payload = JSON.stringify({ eventType, entitySlug, surfaceType, sessionId: getSessionId() });
     const sent = navigator.sendBeacon?.("/api/analytics", new Blob([payload], { type: "application/json" }));
     if (sent) return;

@@ -42,37 +42,40 @@ export async function createMagicLink(email: string, returnTo: string) {
 export async function consumeMagicLink(token: string) {
   const db = getDb();
   if (!db) return null;
-  const now = new Date();
-  const [link] = await db
-    .update(authMagicLinks)
-    .set({ consumedAt: now })
-    .where(and(eq(authMagicLinks.tokenHash, hashOpaqueToken(token)), isNull(authMagicLinks.consumedAt), gt(authMagicLinks.expiresAt, now)))
-    .returning({ email: authMagicLinks.email, returnTo: authMagicLinks.returnTo });
-  if (!link) return null;
+  // Link consumption and session creation serialize with account deletion; old links cannot recreate it.
+  return db.transaction(async (tx) => {
+    const now = new Date();
+    const [link] = await tx
+      .update(authMagicLinks)
+      .set({ consumedAt: now })
+      .where(and(eq(authMagicLinks.tokenHash, hashOpaqueToken(token)), isNull(authMagicLinks.consumedAt), gt(authMagicLinks.expiresAt, now)))
+      .returning({ email: authMagicLinks.email, returnTo: authMagicLinks.returnTo });
+    if (!link) return null;
 
-  await db
-    .insert(users)
-    .values({ id: randomUUID(), email: link.email, createdAt: now })
-    .onConflictDoNothing({ target: users.email });
-  let [user] = await db.select().from(users).where(eq(users.email, link.email)).limit(1);
-  if (!user) return null;
-  const adminEmails = (process.env.ADMIN_EMAILS ?? "").split(",").map((email) => email.trim().toLowerCase()).filter(Boolean);
-  if (adminEmails.includes(user.email) && user.role !== "admin") {
-    [user] = await db.update(users).set({ role: "admin" }).where(eq(users.id, user.id)).returning();
+    await tx
+      .insert(users)
+      .values({ id: randomUUID(), email: link.email, createdAt: now })
+      .onConflictDoNothing({ target: users.email });
+    let [user] = await tx.select().from(users).where(eq(users.email, link.email)).limit(1);
     if (!user) return null;
-  }
+    const adminEmails = (process.env.ADMIN_EMAILS ?? "").split(",").map((email) => email.trim().toLowerCase()).filter(Boolean);
+    if (adminEmails.includes(user.email) && user.role !== "admin") {
+      [user] = await tx.update(users).set({ role: "admin" }).where(eq(users.id, user.id)).returning();
+      if (!user) return null;
+    }
 
-  const sessionToken = createOpaqueToken();
-  const expiresAt = new Date(now.getTime() + SESSION_DAYS * 24 * 60 * 60_000);
-  await db.insert(authSessions).values({
-    id: randomUUID(),
-    userId: user.id,
-    tokenHash: hashOpaqueToken(sessionToken),
-    createdAt: now,
-    lastSeenAt: now,
-    expiresAt,
+    const sessionToken = createOpaqueToken();
+    const expiresAt = new Date(now.getTime() + SESSION_DAYS * 24 * 60 * 60_000);
+    await tx.insert(authSessions).values({
+      id: randomUUID(),
+      userId: user.id,
+      tokenHash: hashOpaqueToken(sessionToken),
+      createdAt: now,
+      lastSeenAt: now,
+      expiresAt,
+    });
+    return { sessionToken, expiresAt, returnTo: safeReturnPath(link.returnTo) };
   });
-  return { sessionToken, expiresAt, returnTo: safeReturnPath(link.returnTo) };
 }
 
 export async function getCurrentUser(): Promise<AuthUser | null> {
@@ -119,5 +122,10 @@ export async function revokeCurrentSession() {
   const cookieStore = await cookies();
   const token = cookieStore.get(sessionCookieName())?.value;
   if (db && token) await db.delete(authSessions).where(eq(authSessions.tokenHash, hashOpaqueToken(token)));
-  cookieStore.delete(sessionCookieName());
+  await clearSessionCookie();
+}
+
+/** Match production __Host- cookie requirements even when expiring the cookie. */
+export async function clearSessionCookie() {
+  (await cookies()).set(sessionCookieName(), "", { path: "/", maxAge: 0, httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production" });
 }

@@ -1,6 +1,6 @@
 # Product screenshots and images
 
-Uploads are optional and disabled by default. They require a migrated database, signed-in owner/editor membership, `RATE_LIMIT_HASH_SALT`, and private storage. Run `pnpm db:migrate` against your own database before enabling this feature; migration `0010_product_media.sql` adds the gallery and deletion tombstones. The offline playground at `/demo/media` uses fictional sample images and never uploads files.
+Uploads are optional and disabled by default. They require a migrated database, signed-in owner/editor membership, `RATE_LIMIT_HASH_SALT`, and private storage. Run `pnpm db:migrate` against your own database before enabling this feature; migration `0010_product_media.sql` adds the gallery and deletion tombstones, and `0011_account_cleanup_grace.sql` protects cleanup from in-flight writes. The offline playground at `/demo/media` uses fictional sample images and never uploads files.
 
 ## Development storage
 
@@ -78,4 +78,4 @@ pnpm media:cleanup          # dry run; aggregate candidate count only
 pnpm media:cleanup --apply  # delete up to 100 eligible objects
 ```
 
-Cleanup retries tombstones and expires unfinished uploads older than one hour. It rechecks eligibility before deleting, never sweeps arbitrary bucket objects, and exits nonzero if any deletion fails. Repeat until the candidate count is zero. Schedule the apply command with your own job runner if needed; no worker is deployed automatically. Failed uploads remain unreadable, even if their cleanup must wait. Hard product deletion preserves keys in tombstones through a checked SQL trigger; retain that trigger in future migrations.
+Cleanup retries tombstones and expires unfinished uploads older than one hour. Uncertain/in-flight writes retain a one-hour cleanup deadline, including after account/product deletion, so a late write cannot recreate an object after it was marked physically deleted. It rechecks eligibility before deleting, never sweeps arbitrary bucket objects, and exits nonzero if any deletion fails. Repeat until the candidate count is zero. Schedule the apply command with your own job runner if needed; no worker is deployed automatically. Failed uploads remain unreadable, even if their cleanup must wait. Hard product deletion preserves keys in tombstones through a checked SQL trigger; retain that trigger in future migrations.

@@ -41,3 +41,6 @@ local.db-wal
 
 # Private development uploads (never commit user images)
 .media/
+
+# Account exports are private user data
+beforebig-account*.json

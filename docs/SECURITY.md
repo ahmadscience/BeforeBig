@@ -55,7 +55,7 @@ Stored submissions require authentication and durable rate limiting. `SUBMISSION
 
 ## Privacy
 
-Avoid raw IP retention. Use short-lived, rotating hashes for deduplication when needed. Keep founder-domain analytics and buyer activity private by default. Support deletion and export before collecting sensitive data.
+Avoid raw IP retention. Use short-lived, rotating hashes for deduplication when needed. Keep founder-domain analytics and buyer activity private by default. Use the account export/deletion controls and define instance retention and backup processes before collecting sensitive data.
 
 The public analytics layer stores only an event type, public entity slug, timestamp, and HMAC-derived anonymous session hash. It does not store raw IP addresses, user agents, or external destination data. GA4 is opt-in by environment configuration and must follow the product's consent/privacy requirements before production use.
 
@@ -81,3 +81,12 @@ The public search index contains only public/approved records. Database triggers
 Uploads are disabled by default. Session/membership/state, exact application Origin, and durable rate limits precede raw-body processing. The server checks bounded bytes, MIME/signature/decoded format, dimensions, animation, and decoder deadlines, then stores a new metadata-free WebP in private storage. There is no SVG/video/remote import path. A per-process decoder cap limits simultaneous native decoding. See [media limits and storage setup](MEDIA.md).
 
 Pending/rejected images are readable only by product members and moderators. Separate moderator approval is required for public viewing; product membership or uploader identity prevents self-approval. Approved media is also hidden when its product becomes hidden. Every gateway read rechecks access, enforces size/digest integrity, and uses no-store headers; the Next image optimizer is deliberately bypassed. Physical removal revokes access before deleting bytes, with tombstones for retry and abandoned-upload cleanup. Keep buckets and local folders private, preserve cleanup triggers, and configure provider backup/version retention. Downloaded copies cannot be revoked. Metadata stripping cannot remove private information visible in pixels or prove image rights; manual review remains necessary.
+
+
+## Account privacy boundaries
+
+`src/db/account.ts` derives identity from the active server session and requires a sign-in within 15 minutes for sensitive actions. Exports use an explicit field allowlist, consistent snapshot, bounded row/byte counts, and private attachment headers; they exclude authentication/network/storage secrets and other users’ private contributions. Image-file exports separately verify uploader identity and canonical size/digest. POST endpoints enforce the configured Origin, account-derived durable limits, and bounded confirmation bodies.
+
+Deletion rechecks session identity inside one transaction, removes personal contributions and pending sign-in links, and relies on checked cascade/set-null foreign keys for associated rows. Account deletion and magic-link consumption serialize so an already issued link cannot recreate the account during the operation. Retained audit payloads are scrubbed; uploads become inaccessible before physical cleanup. Shared records survive; only unshared owner records follow the explicit removal/retention choice. See [privacy behavior and limits](PRIVACY.md).
+
+Optional analytics is off without an explicit browser allow cookie. Both client beacons and server event/outbound handlers check the preference, with GPC taking priority. Opt-out does not bypass essential authentication, rate limits, or moderation. This is a technical preference control, not a legal compliance guarantee.

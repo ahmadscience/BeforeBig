@@ -36,3 +36,8 @@ The service-account key is server-only. The public measurement ID is safe to exp
 - Decide the consent experience for regions where analytics consent is required.
 - Keep detailed founder analytics behind authenticated membership checks when the dashboard expands beyond public aggregates.
 - Keep destination-owner analytics private unless a founder explicitly shares it.
+
+
+## Browser opt-in
+
+Optional internal page/click events and GA4 are off until the browser explicitly allows analytics at `/privacy`. Global Privacy Control overrides an allow choice. Essential security/moderation records remain enabled. Changing the choice reloads the page; opting out clears the browser’s anonymous session identifier but does not remove historical events. Counts therefore reflect only opted-in browser traffic and are not total site usage. See [privacy and retention controls](PRIVACY.md).

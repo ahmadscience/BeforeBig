@@ -3584,3 +3584,32 @@ a.collection-card:hover { border-color: var(--line-strong); }
 .media-demo-item details { margin-top:.8rem; }
 .media-demo-item summary { cursor:pointer; font-size:.85rem; }
 @media(max-width:650px) { .media-demo-upload { grid-template-columns:1fr; gap:.5rem; } }
+
+.privacy-page { max-width:960px; display:grid; gap:1.5rem; }
+.privacy-page h1 { letter-spacing:-.045em; }
+.privacy-panel,.privacy-stack { display:grid; gap:1rem; }
+.privacy-panel { padding:1.5rem; }
+.privacy-panel h2 { font-size:1.4rem; letter-spacing:-.025em; }
+.privacy-panel .button { justify-self:start; }
+.privacy-panel fieldset { border:1px solid var(--line); border-radius:8px; padding:1rem; display:grid; gap:1rem; }
+.privacy-panel legend { padding:0 .4rem; font-weight:600; }
+.privacy-choice { display:flex; align-items:flex-start; gap:.7rem; line-height:1.65; }
+.privacy-choice input { flex-shrink:0; margin-top:.4rem; }
+.privacy-confirm { display:grid; gap:.5rem; font-size:.85rem; font-weight:600; }
+.privacy-confirm input { max-width:22rem; width:100%; padding:.8rem; background:var(--surface); color:var(--text); border:1px solid var(--line-strong); border-radius:6px; }
+.privacy-notice { border-left:3px solid var(--accent); padding:.8rem 1rem; background:var(--surface-2); }
+.privacy-notice a { text-decoration:underline; text-underline-offset:3px; }
+.privacy-danger { border-color:var(--line-strong); }
+.privacy-danger>.eyebrow { color:var(--danger); }
+.privacy-danger button { border-color:var(--danger); color:var(--danger); }
+.privacy-data-list { margin:0; display:grid; gap:1rem; }
+.privacy-data-list>div { display:grid; grid-template-columns:170px 1fr; gap:1rem; border-bottom:1px solid var(--line); padding-bottom:1rem; }
+.privacy-data-list dt { font-weight:600; }
+.privacy-data-list dd { margin:0; color:var(--muted); }
+.privacy-status { padding:.8rem 0; }
+@media(max-width:600px) { .privacy-panel { padding:1rem; } .privacy-data-list>div { grid-template-columns:1fr; gap:.4rem; } }
+.privacy-demo-heading { display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; }
+.privacy-export-preview { max-width:100%; overflow-wrap:anywhere; white-space:pre-wrap; padding:1rem; background:var(--surface-2); border-radius:8px; font-size:.8rem; }
+.privacy-page h1 { font-size:clamp(2rem,4vw,3.25rem); font-weight:650; line-height:1.1; }
+.privacy-page h3,.privacy-demo-heading h2 { font-size:1.2rem; font-weight:600; }
+.privacy-confirm input { font-size:1rem; }
