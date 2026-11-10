@@ -2,7 +2,7 @@
 
 import { headers } from "next/headers";
 import { z } from "zod";
-import { createMagicLink } from "@/lib/auth";
+import { createMagicLink, getCurrentUser } from "@/lib/auth";
 import { appConfig } from "@/lib/config";
 import { sendMagicLinkEmail } from "@/lib/email";
 import { consumeRateLimit } from "@/lib/rate-limit";
@@ -29,6 +29,10 @@ export async function requestMagicLink(_previous: MagicLinkState, formData: Form
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Check your email address." };
 
+  const currentUser = await getCurrentUser();
+  // Reauthentication stays bound to the authenticated account, never a browser-supplied identity.
+  if (currentUser && currentUser.email !== parsed.data.email) return { error: "Use your current account email to confirm access. Sign out first to use another account." };
+
   const genericMessage = "If the address can receive mail, a sign-in link is on its way.";
   const requestHeaders = await headers();
   const networkKey = requestHeaders.get("x-vercel-forwarded-for") ?? requestHeaders.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
@@ -46,7 +50,7 @@ export async function requestMagicLink(_previous: MagicLinkState, formData: Form
     return { message: genericMessage };
   }
 
-  if (anonymousRecaptchaRequired()) {
+  if (!currentUser && anonymousRecaptchaRequired()) {
     const captcha = await verifyRecaptchaToken(parsed.data.captchaToken ?? "");
     if (!captcha.verified) return { error: "Complete the reCAPTCHA check and try again." };
   }

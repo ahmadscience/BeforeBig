@@ -8,13 +8,13 @@ import { Input } from "@/components/ui/input";
 
 const initialState: MagicLinkState = {};
 
-export function MagicLinkForm({ returnTo, captchaRequired, siteKey }: { returnTo: string; captchaRequired: boolean; siteKey?: string }) {
+export function MagicLinkForm({ returnTo, captchaRequired, siteKey, email }: { returnTo: string; captchaRequired: boolean; siteKey?: string; email?: string }) {
   const [state, action, pending] = useActionState(requestMagicLink, initialState);
   return (
     <form action={action} className="auth-form">
       <input type="hidden" name="returnTo" value={returnTo} />
       <label htmlFor="email">Email address</label>
-      <Input id="email" name="email" type="email" autoComplete="email" placeholder="you@company.com" required maxLength={254} />
+      <Input id="email" name="email" type="email" autoComplete="email" placeholder="you@company.com" required maxLength={254} defaultValue={email} readOnly={Boolean(email)} />
       {siteKey ? <RecaptchaChallenge siteKey={siteKey} /> : null}
       {captchaRequired && !siteKey ? <p className="form-error" role="alert">Sign-in is unavailable until the public reCAPTCHA key is configured.</p> : null}
       <Button className="w-full" type="submit" disabled={pending || (captchaRequired && !siteKey)}>{pending ? "Sending…" : "Email me a sign-in link"}</Button>
