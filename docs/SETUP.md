@@ -8,7 +8,7 @@ If pnpm is unavailable, enable Corepack and activate the version in `package.jso
 
 ## Offline demo
 
-Copy `.env.example` to `.env.local` and run `pnpm dev`. Keep `DATABASE_URL` and provider credentials blank. This mode reads `src/data/demo-products.json`; it supports discovery, filtering, comparisons, and provisional URL previews. `/demo/community` adds an interactive browser-only playground that resets on reload; persistent recommendations and collections require a database. Authentication, moderation, reviews, durable analytics, and saving require a database. Example product URLs are fictional, not working services.
+Copy `.env.example` to `.env.local` and run `pnpm dev`. Keep `DATABASE_URL` and provider credentials blank. This mode reads `src/data/demo-products.json`; it supports discovery, filtering, comparisons, and provisional URL previews. `/demo/catalog` demonstrates multi-page search and taxonomy browsing. `/demo/community` adds an interactive browser-only playground that resets on reload; persistent recommendations and collections require a database. Authentication, moderation, reviews, durable analytics, and saving require a database. Example product URLs are fictional, not working services.
 
 Next.js loads root environment files automatically. Scripts load `.env.local` and then `.env` with dotenv. Existing process variables take priority. Restart development after changes; `NEXT_PUBLIC_*` values are embedded at build time for production. Never place secrets in those variables.
 
@@ -22,7 +22,9 @@ pnpm db:seed:demo:preview
 pnpm db:seed:demo
 ```
 
-This version requires migration `0008_sparkling_warhawk.sql` for community recommendations, support votes, and saved collections. Apply all checked migrations before starting the connected app.
+This version requires migration `0009_catalog_search.sql` for FTS5 search, indexed taxonomy, and query indexes. Apply all checked migrations before starting the connected app. This project targets the existing `@libsql/client` adapter and requires SQLite/libSQL with FTS5 and JSON functions. The separate native Turso Database engine uses a different full-text API and is not a drop-in replacement for this migration; see the [engine compatibility reference](https://github.com/tursodatabase/turso/blob/main/COMPAT.md).
+
+The migration creates and backfills `product_search` and `product_catalog_terms`, plus maintenance triggers. No separate search service or credential is required. A migration error mentioning `fts5` means the target engine/build needs FTS5 support; do not bypass the migration or mistake sample fallback for a working index.
 
 These commands target the database in your environment. Review the target before running them. Migrations apply checked SQL through Drizzle's migration ledger. Demo seeding uses stable `demo_` IDs, skips conflicting domains/slugs, and updates its own existing records. Back up a database before schema changes. No automatic rollback command is provided.
 

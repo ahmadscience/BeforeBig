@@ -69,3 +69,8 @@ Stripe is not enabled in the demo. When enabled, raw signed webhook bodies are v
 Recommendation reasons remain private until approved. Authors cannot moderate their own proposal; product owners/editors cannot recommend or support their own products. Support is account-unique and rate-limited; it does not use the product reaction network-lock policy. Reasons are escaped as text and become public with approval.
 
 Collection visibility is enforced at storage reads, not just navigation. Only owners can edit, save, remove, archive, or restore. Public collections are discoverable; private/removed collections return not-found to unauthorized viewers. Public responses omit owner email/ID, pending recommendation identities, and hidden product details. Collection metadata never includes private titles. Soft-removed collections retain data; instance operators must establish a retention policy.
+
+
+## Search and taxonomy
+
+The public search index contains only public/approved records. Database triggers remove entries when records become hidden; queries independently recheck status. Search text is capped at 200 characters, tokenized into literal word-prefix terms, and parameter-bound. Query parameters cannot introduce SQL or FTS operators. Result pages have bounded sizes and deterministic ordering; category/tag counts and facets exclude hidden records. Sample fallback is explicitly labeled and does not stand in for a successful empty database query.

@@ -1,3 +1,4 @@
+import { taxonomyPath } from "@/lib/catalog";
 import Link from "next/link";
 import type { Product } from "@/lib/types";
 import { VoteButton } from "@/components/vote-button";
@@ -20,7 +21,7 @@ export function ProductCard({ product, index, compact = false, returnTo = "/toda
             {product.verificationStatus !== "unverified" ? <span className="compact-verified" title="Verified product">✓</span> : null}
           </div>
           <p>{product.tagline}</p>
-          <div className="compact-meta"><span>{product.category}</span><span>{product.tags[0]}</span></div>
+          <div className="compact-meta"><Link href={{ pathname: taxonomyPath("category", product.category) }}>{product.category}</Link>{product.tags[0] ? <Link href={{ pathname: taxonomyPath("tag", product.tags[0]) }}>{product.tags[0]}</Link> : null}</div>
         </div>
         <div className="compact-signals">
           <span><strong>{product.stats.qualifiedVisits.toLocaleString()}</strong> clicks</span>
@@ -47,10 +48,10 @@ export function ProductCard({ product, index, compact = false, returnTo = "/toda
         <p>{product.tagline}</p>
       </div>
       <div className="tag-row">
-        {product.tags.map((tag) => <Badge key={tag} className="tag" variant="outline">{tag}</Badge>)}
+        {product.tags.map((tag) => <Link key={tag} className="tag" href={{ pathname: taxonomyPath("tag", tag) }}>{tag}</Link>)}
       </div>
       <div className="card-footer">
-        <span>{product.category}</span>
+        <Link href={{ pathname: taxonomyPath("category", product.category) }}>{product.category}</Link>
         <div className="reaction-buttons reaction-buttons-compact">
           <VoteButton slug={product.slug} count={product.stats.upvotes} hasVoted={product.viewerHasVoted} returnTo={returnTo} sample={isSample} />
           <DownvoteButton slug={product.slug} count={product.stats.downvotes} hasDownvoted={product.viewerHasDownvoted} downvoteStatus={product.viewerDownvoteStatus} returnTo={returnTo} sample={isSample} enabled={downvotesEnabled} />

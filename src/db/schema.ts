@@ -40,6 +40,9 @@ export const products = sqliteTable(
   (table) => [
     uniqueIndex("products_slug_unique").on(table.slug),
     uniqueIndex("products_domain_unique").on(table.normalizedDomain),
+    index("products_catalog_status_created_idx").on(table.status, table.createdAt, table.id),
+    index("products_catalog_status_name_idx").on(table.status, table.name, table.id),
+    index("products_catalog_stage_idx").on(table.stage, table.status),
   ],
 );
 
@@ -308,3 +311,15 @@ export const collectionItems = sqliteTable("collection_items", {
   productId: text("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
   createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
 }, (table) => [uniqueIndex("collection_items_collection_product_unique").on(table.collectionId, table.productId)]);
+
+
+// Maintained by migration triggers alongside the FTS5 index, including direct SQL edits/seeds.
+export const productCatalogTerms = sqliteTable("product_catalog_terms", {
+  productId: text("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  kind: text("kind", { enum: ["category", "tag", "platform"] }).notNull(),
+  key: text("key").notNull(),
+  label: text("label").notNull(),
+}, (table) => [
+  uniqueIndex("product_catalog_terms_product_kind_key_unique").on(table.productId, table.kind, table.key),
+  index("product_catalog_terms_lookup_idx").on(table.kind, table.key, table.productId),
+]);

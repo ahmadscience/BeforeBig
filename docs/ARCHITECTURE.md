@@ -28,17 +28,19 @@ Magic links and sessions use random opaque tokens; only hashes are stored. Produ
 
 ## Catalog discovery
 
-`src/lib/discovery.ts` implements filtering, sorting, and related-product scoring. `/today` awaits search parameters and renders a GET form with shareable filter URLs. Search matches all case-insensitive words across public catalog text. Explicit sorting works on a copy; the default preserves repository order.
+`src/db/catalog.ts` queries a SQLite FTS5 index for word-prefix search and indexed category/tag/platform term rows for exact filters. User text is bound as quoted literal prefixes joined by AND; FTS operators are not accepted. Matching counts, ordering, LIMIT, and OFFSET run in the database. Only the selected page receives vote/activity hydration. The default page size is 12, with bounded choices up to 48 and a unique ID tie-breaker for every sort.
 
-`/compare` resolves up to three selections against the public catalog and deduplicates them. It does not resolve arbitrary private products from query strings. Related suggestions use category/tag overlap, distinct from community-endorsed alternative relationships.
+Migration `0009_catalog_search.sql` backfills visible records and maintains both indexes with insert/update/delete triggers. Draft, suspended, and discontinued records are excluded; every read also checks current publication state. Virtual tables/triggers are maintained in checked SQL because Drizzle does not model FTS5. See [SQLite's FTS5 reference](https://www.sqlite.org/fts5.html).
 
-Search currently filters the loaded catalog in memory. Add indexed queries and pagination before supporting a large catalog.
+`/categories` and `/tags` are paginated directories; their detail pages reuse the catalog search component. Taxonomy keys preserve punctuation/Unicode and use URL encoding instead of lossy slug conversion. Sample-only terms are noindex. Filtered query variants are noindex with canonical URLs; indexable real terms can enter the dynamic sitemap. The sitemap term query is capped at 10,000 terms; larger deployments should split sitemaps. Offset pagination remains proportional to offset on very deep pages; cursor pagination is a later optimization.
+
+`/compare` resolves up to three selected public records independently of the shortlist and uses indexed search to find additional choices. Homepage and related-product selectors remain bounded shortlists rather than loading the whole catalog.
 
 ## Data sources and disconnected states
 
 Bundled fixtures carry `source: "sample"`; database records carry `source: "database"`. This provenance affects labels and sample interactions, not authorization. Fixtures disable persistent reactions. Connected demo records have real database counters but remain `noindex`.
 
-Discovery falls back to fixtures if database reads fail. A configured but unreachable database can still fail content/session queries; this is not a complete offline cache. Blank `DATABASE_URL` for a database-free demo.
+Discovery falls back to clearly labeled fixtures if database reads fail; connected empty/no-match results stay empty and are never padded with samples. A configured but unreachable database can still fail content/session queries; this is not a complete offline cache. Blank `DATABASE_URL` for a database-free demo.
 
 Draft submission without persistence returns a clearly labeled provisional preview. Saving requires an authenticated session, durable rate limiting, and the persistence flag. External email, CAPTCHA, and GA4 adapters are configured independently; an unavailable reporting source is not a zero count.
 

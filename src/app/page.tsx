@@ -11,14 +11,13 @@ export default async function HomePage() {
   const user = await getCurrentUser();
   const discoveryProducts = await listDiscoveryProducts(user?.id);
   const featuredProduct = discoveryProducts[0];
-  if (!featuredProduct) return null;
   const liveCount = discoveryProducts.filter((product) => product.source !== "sample" && !product.id.startsWith("prod_") && !product.id.startsWith("demo_")).length;
   const demoCount = discoveryProducts.filter((product) => product.source !== "sample" && product.id.startsWith("demo_")).length;
   const recordLabel = liveCount
     ? `${liveCount} live ${liveCount === 1 ? "record" : "records"}`
     : demoCount
       ? `${demoCount} Turso-backed demo ${demoCount === 1 ? "record" : "records"}`
-      : `${discoveryProducts.length} sample records`;
+      : discoveryProducts.length ? `${discoveryProducts.length} sample records` : "No public records yet";
 
   return (
     <>
@@ -38,7 +37,7 @@ export default async function HomePage() {
             <div><strong>1</strong><span>permanent record</span></div>
           </div>
         </div>
-        <Link className={`hero-feature accent-${featuredProduct.accent}`} href={`/${featuredProduct.slug}`}>
+        {featuredProduct ? <Link className={`hero-feature accent-${featuredProduct.accent}`} href={`/${featuredProduct.slug}`}>
           <div className="feature-topline"><span>Product to watch</span><span>Featured record</span></div>
           <div className="feature-product">
             <span className="product-icon" aria-hidden="true">{featuredProduct.name.slice(0, 1)}</span>
@@ -51,7 +50,7 @@ export default async function HomePage() {
             <div><strong>{featuredProduct.stats.upvotes.toLocaleString()}</strong><span>{featuredProduct.source === "sample" || featuredProduct.id.startsWith("prod_") ? "sample upvotes" : "upvotes"}</span></div>
           </div>
           <div className="feature-link">Open product record <span aria-hidden="true">↗</span></div>
-        </Link>
+        </Link> : <div className="hero-feature"><p className="eyebrow">A new field guide</p><h2>The catalog is ready for its first product</h2><p>Submit a product to start building a useful public record.</p><Link href="/submit" className="text-link">Create a product record →</Link></div>}
       </section>
 
       <section className="shell section-block home-shortlist">

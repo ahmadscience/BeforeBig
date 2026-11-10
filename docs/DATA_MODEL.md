@@ -84,3 +84,10 @@ Migration `0008_sparkling_warhawk.sql` adds four tables:
 - `collection_items`: unique collection/product save with cascade cleanup on actual collection/product deletion.
 
 Foreign keys and unique indexes protect associations. The data-access layer additionally enforces owner-only collection mutations, private read access, approved-product requirements, conflict-of-interest rules, and separate moderator approval. Public DTOs omit author/owner identities. Removed collections retain items for restoration and are excluded from all public reads.
+
+
+## Indexed discovery
+
+Migration `0009_catalog_search.sql` adds `product_catalog_terms`, indexed by `(kind, key, product_id)` with a unique product/kind/key constraint. Category, tag, and platform rows are deduplicated and maintained by product triggers. Keys follow SQLite `lower(trim(...))`: ASCII case is folded, punctuation and Unicode identities are preserved. Terms are rechecked against public/approved product state when read.
+
+`product_search` is a SQL-managed FTS5 virtual table keyed by the product rowid. It indexes name, tagline, description, category, and valid text tags for public/approved products only. Inserts, edits, status transitions, and deletes update both indexes atomically with the product operation. Product status/date/name and stage indexes support structured queries. Custom virtual tables/triggers must be preserved when generating future migrations.

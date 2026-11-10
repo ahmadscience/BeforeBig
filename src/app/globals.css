@@ -3514,3 +3514,32 @@ a.collection-card:hover { border-color: var(--line-strong); }
 
 .collections-page { padding-top: 48px; padding-bottom: 64px; }
 .collections-page .noindex-banner { border-color: var(--line); color: var(--muted); background: var(--surface); }
+
+/* Public catalog directories and shareable result navigation. */
+.catalog-browse { display: flex; flex-wrap: wrap; gap: 12px 24px; margin-block: 24px; color: var(--muted); font-size: 14px; }
+.catalog-browse a:hover, .compact-meta a:hover, .tag-row a:hover { color: var(--accent-text); text-decoration: underline; }
+.catalog-notice { padding: 16px; border-left: 2px solid var(--line-strong); background: var(--surface); color: var(--muted); margin-block: 24px; }
+.catalog-pagination { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-block: 24px; font-variant-numeric: tabular-nums; }
+.catalog-pagination > div { display: flex; flex-wrap: wrap; gap: 4px; }
+.catalog-pagination a, .pagination-current, .pagination-gap { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; min-height: 40px; padding: 8px 12px; border-radius: 8px; }
+.catalog-pagination a:hover { background: var(--surface); }
+.catalog-pagination [aria-disabled="true"] { color: var(--subtle); }
+.pagination-current { color: var(--accent-text); background: var(--surface); border: 1px solid var(--line); }
+.taxonomy-directory { padding-block: 48px 64px; }
+.taxonomy-directory h1 { font-size: clamp(32px, 4vw, 48px); line-height: 1.12; font-weight: 500; letter-spacing: -0.03em; }
+.taxonomy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; margin-block: 24px; }
+.taxonomy-link { display: grid; gap: 16px; text-align: left; padding: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow-wrap: anywhere; }
+.taxonomy-link strong { font-size: 18px; font-weight: 500; }
+.taxonomy-link span { color: var(--muted); font-size: 13px; }
+.taxonomy-link:hover { border-color: var(--line-strong); }
+.compact-meta a + a::before { content: "·"; margin-inline: 8px; color: var(--subtle); }
+.catalog-demo { max-width: 1024px; }
+.catalog-demo h2 { font-size: 28px; font-weight: 500; margin-bottom: 24px; }
+.catalog-demo h3 { font-size: 18px; font-weight: 500; }
+.catalog-demo .community-list { margin-top: 0; }
+.catalog-demo-row { display: flex; align-items: start; justify-content: space-between; gap: 24px; }
+.catalog-demo-terms { display: flex; flex-wrap: wrap; gap: 8px 16px; color: var(--muted); font-size: 13px; }
+.catalog-demo-terms button:hover { color: var(--accent-text); text-decoration: underline; }
+.demo-url { display: block; overflow-wrap: anywhere; padding-block: 12px; color: var(--subtle); }
+@media (max-width: 720px) { .catalog-pagination { gap: 12px; } .catalog-demo .catalog-search input { font-size: 16px; } }
+@media (pointer: coarse) { .catalog-pagination a, .catalog-demo button { min-height: 44px; } }

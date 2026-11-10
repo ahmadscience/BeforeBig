@@ -1,3 +1,4 @@
+import { taxonomyPath } from "@/lib/catalog";
 import { CommunityPanel } from "@/components/community-panel";
 import type { Metadata, Route } from "next";
 import Link from "next/link";
@@ -54,12 +55,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
       {isFixture ? <div className="noindex-banner"><span>●</span> Sample record · demo data · not indexed</div> : null}
       {isDemo ? <div className="noindex-banner"><span>●</span> Turso-backed demo · live counters · not indexed</div> : null}
       {isPersisted && !isVerified ? <div className="noindex-banner"><span>●</span> Preview record · public but not indexed until verified</div> : null}
-      <div className="product-breadcrumb"><Link href="/today">Discover</Link><span>›</span><span>{product.category}</span><span>›</span><span>{product.name}</span></div>
+      <div className="product-breadcrumb"><Link href="/today">Discover</Link><span>›</span><Link href={{ pathname: taxonomyPath("category", product.category) }}>{product.category}</Link><span>›</span><span>{product.name}</span></div>
       <header className="product-hero">
         <div className="product-identity">
           <div className="product-icon product-icon-large" aria-hidden="true">{product.name.slice(0, 1)}</div>
           <div className="product-title">
-            <div className="tag-row"><span className="tag">{product.stage}</span><span className="tag">{product.category}</span></div>
+            <div className="tag-row"><span className="tag">{product.stage}</span><Link className="tag" href={{ pathname: taxonomyPath("category", product.category) }}>{product.category}</Link>{product.tags.map((tag) => <Link className="tag" key={tag} href={{ pathname: taxonomyPath("tag", tag) }}>{tag}</Link>)}</div>
             <h1>{product.name}</h1>
             <p>{product.tagline}</p>
           </div>
@@ -126,7 +127,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <p>Suggestions share a category or tag. They are not community-endorsed replacements.</p>
             {related.map((candidate) => <Link key={candidate.slug} href={`/${candidate.slug}`}><strong>{candidate.name}</strong><span>{candidate.tagline}</span><small>{candidate.price}</small></Link>)}
             {!related.length ? <p>No related records yet.</p> : null}
-            <Link href={{ pathname: "/today", query: { category: product.category } }}>Browse this category →</Link>
+            <Link href={{ pathname: taxonomyPath("category", product.category) }}>Browse this category →</Link>
           </div>
           <div className="side-panel record-actions">
             <p className="eyebrow">Ranking policy</p>

@@ -64,6 +64,13 @@
       "when": 1794298107825,
       "tag": "0008_sparkling_warhawk",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1794299750932,
+      "tag": "0009_catalog_search",
+      "breakpoints": true
     }
   ]
 }

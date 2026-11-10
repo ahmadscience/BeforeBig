@@ -15,7 +15,7 @@ function accentForSlug(slug: string): Product["accent"] {
   return accents[score % accents.length] ?? "blue";
 }
 
-function rowToProduct(row: ProductRow, upvotes = 0, downvotes = 0): Product {
+export function rowToProduct(row: ProductRow, upvotes = 0, downvotes = 0): Product {
   let tags: string[] = [];
   try {
     const parsed = JSON.parse(row.tagsJson);
@@ -217,6 +217,15 @@ export async function listDiscoverablePersistedProducts(viewerUserId?: string) {
     .orderBy(desc(count(productVotes.id)), desc(products.createdAt))
     .limit(24);
 
+  return hydrateDiscoveryRows(db, rows, viewerUserId);
+}
+
+/** Enrich only the selected page, never the entire catalog. */
+export async function hydrateDiscoveryRows(
+  db: NonNullable<ReturnType<typeof getDb>>,
+  rows: { product: ProductRow; upvotes: number }[],
+  viewerUserId?: string,
+) {
   const productIds = rows.map((row) => row.product.id);
   const productSlugs = rows.map((row) => row.product.slug);
   const [downvoteRows, votedRows, downvotedRows, analyticsRows, reviewRows] = await Promise.all([
