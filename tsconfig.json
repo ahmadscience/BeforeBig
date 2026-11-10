@@ -34,7 +34,8 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "vitest.config.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    "scripts/media-cleanup.ts"
   ],
   "exclude": [
     "node_modules"

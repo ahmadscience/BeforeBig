@@ -8,7 +8,7 @@ If pnpm is unavailable, enable Corepack and activate the version in `package.jso
 
 ## Offline demo
 
-Copy `.env.example` to `.env.local` and run `pnpm dev`. Keep `DATABASE_URL` and provider credentials blank. This mode reads `src/data/demo-products.json`; it supports discovery, filtering, comparisons, and provisional URL previews. `/demo/catalog` demonstrates multi-page search and taxonomy browsing. `/demo/community` adds an interactive browser-only playground that resets on reload; persistent recommendations and collections require a database. Authentication, moderation, reviews, durable analytics, and saving require a database. Example product URLs are fictional, not working services.
+Copy `.env.example` to `.env.local` and run `pnpm dev`. Keep `DATABASE_URL` and provider credentials blank. This mode reads `src/data/demo-products.json`; it supports discovery, filtering, comparisons, and provisional URL previews. `/demo/catalog` demonstrates multi-page search and taxonomy browsing. `/demo/community` adds an interactive browser-only playground that resets on reload; persistent recommendations and collections require a database. Authentication, moderation, reviews, durable analytics, and saving require a database. `/demo/media` demonstrates screenshot moderation and galleries using sample images. Example product URLs are fictional, not working services.
 
 Next.js loads root environment files automatically. Scripts load `.env.local` and then `.env` with dotenv. Existing process variables take priority. Restart development after changes; `NEXT_PUBLIC_*` values are embedded at build time for production. Never place secrets in those variables.
 
@@ -22,7 +22,7 @@ pnpm db:seed:demo:preview
 pnpm db:seed:demo
 ```
 
-This version requires migration `0009_catalog_search.sql` for FTS5 search, indexed taxonomy, and query indexes. Apply all checked migrations before starting the connected app. This project targets the existing `@libsql/client` adapter and requires SQLite/libSQL with FTS5 and JSON functions. The separate native Turso Database engine uses a different full-text API and is not a drop-in replacement for this migration; see the [engine compatibility reference](https://github.com/tursodatabase/turso/blob/main/COMPAT.md).
+This version requires all checked migrations through `0010_product_media.sql` (private media). Migration `0009_catalog_search.sql` is required for FTS5 search, indexed taxonomy, and query indexes. Apply all checked migrations before starting the connected app. This project targets the existing `@libsql/client` adapter and requires SQLite/libSQL with FTS5 and JSON functions. The separate native Turso Database engine uses a different full-text API and is not a drop-in replacement for this migration; see the [engine compatibility reference](https://github.com/tursodatabase/turso/blob/main/COMPAT.md).
 
 The migration creates and backfills `product_search` and `product_catalog_terms`, plus maintenance triggers. No separate search service or credential is required. A migration error mentioning `fts5` means the target engine/build needs FTS5 support; do not bypass the migration or mistake sample fallback for a working index.
 
@@ -58,6 +58,7 @@ For local founder workflows, enable `AUTH_DEV_MAGIC_LINK_ENABLED="true"` and `SU
 | `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY`, `RECAPTCHA_ALLOWED_HOSTNAMES` | Anonymous form protection for hosting; hostnames exclude scheme, port, and path |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Optional GA4 browser tag; leave blank to avoid loading it |
 | `GA_PROPERTY_ID`, `GA_CLIENT_EMAIL`, `GA_PRIVATE_KEY` | Optional read-only GA4 reporting credentials |
+| `MEDIA_UPLOADS_ENABLED`, `MEDIA_STORAGE_DRIVER`, `MEDIA_LOCAL_DIR`, `MEDIA_S3_*` | Optional private image uploads; [storage setup and cleanup](MEDIA.md) |
 | `TRAFFIC_FEATURE_ENABLED`, `PAYMENTS_FEATURE_ENABLED` | Reserved flags; do not implement traffic delivery or payments by enabling them |
 
 All flags are enabled only by the literal string `true`. Public values are not secrets. Use at least 32 random characters for secrets; do not reuse credentials between instances.

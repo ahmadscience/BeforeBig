@@ -60,3 +60,12 @@ Taxonomy paths use encoded, normalized labels, such as `/categories/project%20ma
 Catalog pages default to 12 products and offer 4, 24, or 48 per page. Search does not stop at the first 24 records. Counts and results can change as the live catalog changes; page ordering uses a unique record ID to make ties stable. Compare's search box finds candidates outside the initial shortlist and keeps existing selections.
 
 Try `/demo/catalog` without an account to explore multiple pages, category/tag browsing, empty states, and search with fictional data. It uses browser-only sample filtering, not a live search index.
+
+
+## Product screenshots and images
+
+After the operator configures [private media storage](MEDIA.md), open your product editor in the dashboard. Choose a PNG, JPEG, or WebP image (up to 4 MiB), describe its contents for accessibility, optionally add a caption, and confirm publication rights and that you checked visible private information. Six images are allowed per product. Uploads stay private until another moderator approves them. Changed descriptions/captions return images to review; approved images can be selected as the gallery cover.
+
+Moderators review the image tabs at `/admin/moderation`, including already approved images that need to be hidden or removed. A rejection note is visible to the founder. Owners/editors and moderators can permanently remove an image; access stops immediately, and storage deletion failures are reported for operator cleanup. Removal cannot erase previously downloaded copies.
+
+Try `/demo/media` without storage or an account. The sample upload, role switch, approval, cover, and removal actions affect fictional browser-memory images only. They do not exercise the live storage provider.

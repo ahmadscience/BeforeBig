@@ -38,3 +38,6 @@ local.db-wal
 *.dump
 *.bak
 .vercel/
+
+# Private development uploads (never commit user images)
+.media/

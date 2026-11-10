@@ -1,3 +1,7 @@
+import Link from "next/link";
+import { getMediaStore } from "@/db/media";
+import { MediaImage } from "@/components/media-image";
+import { MediaForm } from "@/components/media-form";
 import { CommunityForm } from "@/components/community-form";
 import { getCommunityStore } from "@/db/community";
 import type { Metadata } from "next";
@@ -9,8 +13,11 @@ import { productDownvotes, products, reviews, users } from "@/db/schema";
 
 export const metadata: Metadata = { title: "Moderation", robots: { index: false, follow: false } };
 
-export default async function ModerationPage() {
+export default async function ModerationPage({ searchParams }: { searchParams: Promise<{ media?: string }> }) {
   const moderator = await requireModerator();
+  const mediaStatus = (await searchParams).media;
+  const mediaFilter = mediaStatus === "approved" || mediaStatus === "rejected" ? mediaStatus : "pending";
+  const mediaQueue = await getMediaStore()?.queue(moderator, mediaFilter) ?? [];
   const alternativeQueue = await getCommunityStore()?.queue(moderator) ?? [];
   const db = getDb();
   const [productQueue, reviewQueue, downvoteQueue] = db ? await Promise.all([
@@ -42,6 +49,18 @@ export default async function ModerationPage() {
           </div>}
         </article>)}
         {!alternativeQueue.length ? <p className="muted">No alternatives need attention.</p> : null}
+      </section>
+      <section className="panel community-moderation"><h2>Product images <span>{mediaQueue.length}</span></h2>
+        <p className="muted">Review visible content, rights, captions, and accessibility. Only approved images on public products appear to visitors. Latest 100 in each queue.</p>
+        <nav className="media-filter" aria-label="Image moderation status">{(["pending", "approved", "rejected"] as const).map((status) => <Link key={status} href={{ pathname: "/admin/moderation", query: { media: status } }} aria-current={mediaFilter === status ? "page" : undefined}>{status}</Link>)}</nav>
+        <div className="media-manager-grid">{mediaQueue.map((item) => <article key={item.id} className="media-manage-item">
+          <h3>{item.productName}</h3><MediaImage item={item} /><p>{item.caption || item.altText}</p><p className="media-status">{item.status} · {item.kind}</p>
+          {item.moderationNote ? <p>Review note: {item.moderationNote}</p> : null}
+          {item.own ? <p className="muted">Another moderator must approve your uploads.</p> : <MediaForm id={item.id} operation="moderate" fields={{ decision: "approved" }} label="Approve image"><label>Review note (visible to founder)<input name="note" maxLength={500} /></label></MediaForm>}
+          <MediaForm id={item.id} operation="moderate" fields={{ decision: "rejected" }} label="Reject / hide image"><label>Reason (visible to founder)<input name="note" maxLength={500} /></label></MediaForm>
+          <details><summary>Delete stored image</summary><p>Use for removal requests or prohibited content. Access is revoked before storage cleanup.</p><MediaForm id={item.id} operation="remove" label="Permanently remove image" /></details>
+        </article>)}</div>
+        {!mediaQueue.length ? <p className="empty-copy">No {mediaFilter} images.</p> : null}
       </section>
       <div className="moderation-grid">
         <section className="panel"><h2>Product records <span>{productQueue.length}</span></h2>

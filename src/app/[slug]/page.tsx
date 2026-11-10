@@ -1,3 +1,4 @@
+import { ProductMediaGallery } from "@/components/product-media";
 import { taxonomyPath } from "@/lib/catalog";
 import { CommunityPanel } from "@/components/community-panel";
 import type { Metadata, Route } from "next";
@@ -91,6 +92,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             {product.sourceUrl ? <div><span>Source repository (founder-provided)</span><a href={product.sourceUrl} target="_blank" rel="noopener noreferrer nofollow">View source ↗</a></div> : null}
             <div><span>Primary category</span><strong>{product.category}</strong></div>
           </section>
+          <ProductMediaGallery productId={product.id} />
           <CommunityPanel product={product} catalog={catalog} userId={user?.id} />
           <section className="product-block">
             <div className="block-heading"><div><p className="eyebrow">Record history</p><h2>Evidence over time</h2></div><span className="muted">One permanent record</span></div>

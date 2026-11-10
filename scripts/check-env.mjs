@@ -51,6 +51,19 @@ if (process.env.EMAIL_PROVIDER === "mailgun") {
   }
 }
 
+if (process.env.MEDIA_UPLOADS_ENABLED === "true") {
+  if (process.env.MEDIA_STORAGE_DRIVER !== "s3") errors.push("Production media uploads require the s3 storage driver.");
+  const bucket = required("MEDIA_S3_BUCKET");
+  if (bucket && !/^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/.test(bucket)) errors.push("MEDIA_S3_BUCKET must be a valid bucket name.");
+  required("MEDIA_S3_REGION"); required("MEDIA_S3_ACCESS_KEY_ID"); required("MEDIA_S3_SECRET_ACCESS_KEY");
+  if (process.env.MEDIA_S3_ENDPOINT) {
+    try {
+      const endpoint = new URL(process.env.MEDIA_S3_ENDPOINT);
+      if (endpoint.protocol !== "https:" || endpoint.username || endpoint.password || endpoint.pathname !== "/" || endpoint.search || endpoint.hash) errors.push("MEDIA_S3_ENDPOINT must be an HTTPS origin only.");
+    } catch { errors.push("MEDIA_S3_ENDPOINT must be a valid HTTPS origin."); }
+  }
+}
+
 if (errors.length) {
   console.error("BeforeBig deployment environment is incomplete:\n");
   for (const error of errors) console.error(`- ${error}`);

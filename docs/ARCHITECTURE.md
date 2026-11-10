@@ -49,7 +49,7 @@ Draft submission without persistence returns a clearly labeled provisional previ
 - Server actions and route handlers enforce authorization; hidden controls are not a security boundary.
 - Anonymous analytics append events through `/api/analytics`; outbound links record clicks through `/go/[slug]`. GA4 is optional and reported separately.
 - Votes and reviews use database uniqueness and moderation rules described in [the data model](DATA_MODEL.md).
-- Third-party scripts stay optional and route-scoped. The app uses system fonts and has no media upload pipeline.
+- Third-party scripts stay optional and route-scoped. The app uses system fonts. Optional image uploads use a private gateway, not public bucket URLs.
 - Hosting needs a server runtime and remote database; static export is not supported. No official service or background worker is provided.
 - CI runs typechecking, lint, tests, a production build, and the existing Lighthouse budgets. See [contributing](../CONTRIBUTING.md).
 
@@ -59,3 +59,12 @@ Draft submission without persistence returns a clearly labeled provisional previ
 `src/db/community.ts` centralizes recommendation lifecycle and collection authorization. Server actions derive the actor from the session, validate input, apply durable rate limits, and invalidate dependent pages. Public reads filter relationship state and both product states. Collection reads apply visibility/ownership before returning titles or items, and public DTOs omit identity fields. Generic collection metadata prevents private title leakage.
 
 `/demo/community` is an isolated Client Component playground. Its local role switch never calls server actions, changes account permissions, or writes to a database.
+
+
+## Private media boundary
+
+`src/lib/media-image.ts` bounds and decodes raw image bodies with Sharp, strips metadata, and stores only canonical WebP bytes. `src/db/media.ts` owns authorization, transactional gallery slots, review transitions, cover order, and deletion tombstones. `src/lib/media-service.ts` coordinates database state with `media-storage.ts` (private local development files or S3-compatible object storage). Writes reserve an unreadable slot before storage; uncertain writes remain eligible for cleanup.
+
+`POST /api/products/[slug]/media` accepts a bounded raw body and URL-encoded JSON image details in `X-Media-Metadata`; same-origin, session, membership, upload flag, and durable account limits are checked first. `/media/[id]` rechecks current visibility and verifies stored size/digest on every request. It never returns keys or redirects to buckets. `MediaImage` bypasses Next image optimization because its cache would undermine revocation. Public gallery markup contains only approved media on visible products.
+
+`/demo/media` is isolated browser-memory sample data; its role switch never grants real privileges. `scripts/media-cleanup.ts` defaults to a dry run and requires `--apply` for physical deletion. No bucket or background job is provisioned. See [media configuration and limits](MEDIA.md).

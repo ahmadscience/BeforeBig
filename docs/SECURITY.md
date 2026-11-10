@@ -74,3 +74,10 @@ Collection visibility is enforced at storage reads, not just navigation. Only ow
 ## Search and taxonomy
 
 The public search index contains only public/approved records. Database triggers remove entries when records become hidden; queries independently recheck status. Search text is capped at 200 characters, tokenized into literal word-prefix terms, and parameter-bound. Query parameters cannot introduce SQL or FTS operators. Result pages have bounded sizes and deterministic ordering; category/tag counts and facets exclude hidden records. Sample fallback is explicitly labeled and does not stand in for a successful empty database query.
+
+
+## Uploaded images
+
+Uploads are disabled by default. Session/membership/state, exact application Origin, and durable rate limits precede raw-body processing. The server checks bounded bytes, MIME/signature/decoded format, dimensions, animation, and decoder deadlines, then stores a new metadata-free WebP in private storage. There is no SVG/video/remote import path. A per-process decoder cap limits simultaneous native decoding. See [media limits and storage setup](MEDIA.md).
+
+Pending/rejected images are readable only by product members and moderators. Separate moderator approval is required for public viewing; product membership or uploader identity prevents self-approval. Approved media is also hidden when its product becomes hidden. Every gateway read rechecks access, enforces size/digest integrity, and uses no-store headers; the Next image optimizer is deliberately bypassed. Physical removal revokes access before deleting bytes, with tombstones for retry and abandoned-upload cleanup. Keep buckets and local folders private, preserve cleanup triggers, and configure provider backup/version retention. Downloaded copies cannot be revoked. Metadata stripping cannot remove private information visible in pixels or prove image rights; manual review remains necessary.

@@ -21,9 +21,10 @@ beforeEach(async () => {
   client = createClient({ url: "file:" + join(directory, "test.db") }); db = drizzle(client, { schema });
   const migrations = readdirSync("drizzle").filter((name) => name.endsWith(".sql")).sort();
   // Insert old records before the new migration to exercise its backfill, not just its triggers.
-  for (const migration of migrations.slice(0, -1)) await client.executeMultiple(readFileSync("drizzle/" + migration, "utf8"));
+  const searchIndex = migrations.indexOf("0009_catalog_search.sql");
+  for (const migration of migrations.slice(0, searchIndex)) await client.executeMultiple(readFileSync("drizzle/" + migration, "utf8"));
   await db.insert(schema.products).values(row("existing"));
-  await client.executeMultiple(readFileSync("drizzle/" + migrations.at(-1), "utf8"));
+  for (const migration of migrations.slice(searchIndex)) await client.executeMultiple(readFileSync("drizzle/" + migration, "utf8"));
   store = createCatalogStore(db);
 });
 afterEach(() => { client.close(); rmSync(directory, { recursive: true, force: true }); });

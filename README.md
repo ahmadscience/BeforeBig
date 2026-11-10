@@ -20,7 +20,7 @@ Open [127.0.0.1:3247](http://127.0.0.1:3247). Keep this project's reserved port 
 
 The example environment defaults to **offline demo mode**: no database account, email provider, CAPTCHA, or analytics account is required. Bundled fictional records use `.example` domains. Search and comparison work; login and persistent changes require your own database. Submitting a URL without persistence produces a provisional preview, not a saved record. Never copy someone else's database credentials.
 
-Try the catalog playground at `/demo/catalog` and the community playground at `/demo/community` to explore recommendations, moderation, support votes, and collections with fictional data. Changes reset on reload.
+Try the catalog playground at `/demo/catalog` and the community playground at `/demo/community` to explore recommendations, moderation, support votes, and collections with fictional data. The media playground at `/demo/media` demonstrates image review and galleries. Changes reset on reload.
 
 See [setup and configuration](docs/SETUP.md) to enable authentication and writes using your own Turso database. The application database adapter uses libSQL's web transport; a local SQLite file is not a supported application setup.
 
@@ -33,6 +33,7 @@ See [setup and configuration](docs/SETUP.md) to enable authentication and writes
 - Moderated community-recommended alternatives with reasons and support votes, separate from category/tag suggestions.
 - Owner-managed public/private collections with duplicate-safe saves, removal, and restore.
 - Email magic-link authentication, founder dashboard, editable drafts, DNS TXT ownership verification, and role-checked moderation.
+- Validated screenshot/image uploads, private local or S3-compatible storage, moderation, gallery covers, and retryable removal.
 - Founder updates, moderated reviews, authenticated upvotes, and private reasoned downvotes pending admin approval.
 - Database-enforced account/network reaction limits and HMAC-based anonymous analytics.
 - Optional GA4 reporting, light/dark themes, security headers, sitemap/noindex rules, CI, and Lighthouse budgets.
@@ -62,6 +63,7 @@ pnpm perf:audit
 | [Architecture](docs/ARCHITECTURE.md) | Runtime boundaries and repository map |
 | [Data model](docs/DATA_MODEL.md) | Tables, lifecycle, and reaction invariants |
 | [Security model](docs/SECURITY.md) | Authentication, URL handling, privacy, limitations |
+| [Media](docs/MEDIA.md) | Image validation, private storage setup, moderation, cleanup |
 | [Analytics](docs/ANALYTICS.md) | Counter definitions and optional GA4 |
 | [Features and roadmap](docs/FEATURES.md) | Supported capabilities and planned improvements |
 

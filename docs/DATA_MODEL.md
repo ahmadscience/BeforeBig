@@ -91,3 +91,10 @@ Foreign keys and unique indexes protect associations. The data-access layer addi
 Migration `0009_catalog_search.sql` adds `product_catalog_terms`, indexed by `(kind, key, product_id)` with a unique product/kind/key constraint. Category, tag, and platform rows are deduplicated and maintained by product triggers. Keys follow SQLite `lower(trim(...))`: ASCII case is folded, punctuation and Unicode identities are preserved. Terms are rechecked against public/approved product state when read.
 
 `product_search` is a SQL-managed FTS5 virtual table keyed by the product rowid. It indexes name, tagline, description, category, and valid text tags for public/approved products only. Inserts, edits, status transitions, and deletes update both indexes atomically with the product operation. Product status/date/name and stage indexes support structured queries. Custom virtual tables/triggers must be preserved when generating future migrations.
+
+
+## Product media
+
+Migration `0010_product_media.sql` adds `product_media`: random ID/key, nullable product/uploader references, kind, alt text/caption, canonical width/height/byte size/SHA-256, position, rights-confirmation timestamp, review attribution/note, and upload/deletion timestamps. Gallery, moderation, and unique storage-key indexes support bounded queries. Storage keys, digests, uploader IDs, and private moderation notes are omitted from public DTOs.
+
+The lifecycle is `uploading → pending → approved/rejected`. Changed text/type returns media to pending. Six active slots include uploading reservations; a transaction checks the cap before insert. Failed uploads are tombstoned; deleted rows revoke reads immediately and retain keys until object deletion succeeds. `storage_deleted_at` records successful cleanup. The `products_media_before_delete` trigger tombstones rows before their product FK is set null, preserving cleanup information after hard deletion. User deletion sets media attribution null; account deletion itself remains a future workflow. Preserve this SQL-managed trigger when generating later migrations.

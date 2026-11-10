@@ -1,6 +1,7 @@
 import type { Metadata, Route } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ProductMediaManager } from "@/components/product-media";
 import { ProductEditForm } from "@/components/product-edit-form";
 import { ProductUpdateForm } from "@/components/product-update-form";
 import { requireUser } from "@/lib/auth";
@@ -25,6 +26,7 @@ export default async function EditProductPage({ params }: EditPageProps) {
       </div>
       <div className="status-strip"><span className="status-dot" /> {product.status} · {product.verificationStatus.replaceAll("_", " ")} · access: {membership.role}</div>
       <div className="panel"><ProductEditForm product={product} /></div>
+      <ProductMediaManager actor={user} slug={product.slug} />
       <div className="panel manage-content-panel"><div><p className="eyebrow">Record update</p><h2>Publish a milestone</h2><p className="muted">Updates are append-only public history. Keep them factual.</p></div><ProductUpdateForm slug={product.slug} /></div>
       <div className="manage-actions">
         <Link href={`/claim/${product.slug}` as Route} className="button button-primary">Verify domain ownership →</Link>

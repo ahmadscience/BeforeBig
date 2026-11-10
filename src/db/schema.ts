@@ -323,3 +323,27 @@ export const productCatalogTerms = sqliteTable("product_catalog_terms", {
   uniqueIndex("product_catalog_terms_product_kind_key_unique").on(table.productId, table.kind, table.key),
   index("product_catalog_terms_lookup_idx").on(table.kind, table.key, table.productId),
 ]);
+
+export const productMedia = sqliteTable("product_media", {
+  id: text("id").primaryKey(),
+  // Preserve tombstones/object keys after product removal so cleanup can still delete private bytes.
+  productId: text("product_id").references(() => products.id, { onDelete: "set null" }),
+  uploaderUserId: text("uploader_user_id").references(() => users.id, { onDelete: "set null" }),
+  storageKey: text("storage_key").notNull(),
+  kind: text("kind", { enum: ["screenshot", "image"] }).notNull().default("screenshot"),
+  altText: text("alt_text").notNull(),
+  caption: text("caption").notNull().default(""),
+  width: integer("width").notNull(), height: integer("height").notNull(), byteSize: integer("byte_size").notNull(),
+  sha256: text("sha256").notNull(),
+  position: integer("position").notNull().default(0),
+  status: text("status", { enum: ["uploading", "pending", "approved", "rejected", "failed", "deleted"] }).notNull().default("uploading"),
+  rightsConfirmedAt: integer("rights_confirmed_at", { mode: "timestamp_ms" }).notNull(),
+  moderatedByUserId: text("moderated_by_user_id").references(() => users.id, { onDelete: "set null" }),
+  moderatedAt: integer("moderated_at", { mode: "timestamp_ms" }), moderationNote: text("moderation_note"),
+  deletedAt: integer("deleted_at", { mode: "timestamp_ms" }), storageDeletedAt: integer("storage_deleted_at", { mode: "timestamp_ms" }),
+  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(), updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
+}, (table) => [
+  uniqueIndex("product_media_storage_key_unique").on(table.storageKey),
+  index("product_media_gallery_idx").on(table.productId, table.deletedAt, table.status, table.position),
+  index("product_media_queue_idx").on(table.status, table.deletedAt, table.createdAt),
+]);
